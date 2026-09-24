@@ -126,6 +126,19 @@ def _cmd_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_policy(args: argparse.Namespace) -> int:
+    from fraud.policy.evaluate import rerank, run
+    from fraud.spark import get_spark
+
+    if args.rerank:
+        rerank(get_spark("policy"), settings())
+        return 0
+
+    result = run(get_spark("policy"), settings())
+    print(json.dumps({k: round(v["total_cost"]) for k, v in result["test"].items()}))
+    return 0
+
+
 def _cmd_catalogue(args: argparse.Namespace) -> int:
     from fraud.features.catalogue import render
 
@@ -188,6 +201,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--report-only", action="store_true", help="re-render the report from saved metrics"
     )
     p.set_defaults(func=_cmd_evaluate)
+
+    p = sub.add_parser("policy", help="choose the policy on valid, freeze, report on test")
+    p.add_argument(
+        "--rerank",
+        action="store_true",
+        help="recompute only the validation ranking comparison and re-render the report",
+    )
+    p.set_defaults(func=_cmd_policy)
 
     p = sub.add_parser("catalogue", help="write docs/features.md from the definitions")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "features.md")

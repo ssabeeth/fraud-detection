@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 4 (modelling) done; phase 5 (decision policy) next.**
+**Status: phase 5 (decision policy and money) done; phase 6 (explainability) next.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -22,7 +22,7 @@ the owner can do".
 | 2. Data and lakehouse | done | `v0.2-lakehouse` |
 | 3. Features | done | `v0.3-features` |
 | 4. Modelling | done | `v0.4-modelling` |
-| 5. Decision policy and money | not started | |
+| 5. Decision policy and money | done | `v0.5-policy` |
 | 6. Explainability and governance | not started | |
 | 7. Streaming | not started | |
 | 8. Serving and monitoring | not started | |
@@ -112,3 +112,21 @@ Done:
 
 Kept failure: logistic regression collapses on May because one legitimate pseudo-card
 with 1,393 transactions fills its alert list (see DECISIONS.md).
+
+### Phase 5 — Decision policy and money (2026-09-24)
+
+Done:
+- Cost model in `configs/costs.yaml` (seven assumptions, each with a rationale and a
+  range), with hand-checked tests.
+- Policies decided in arrival order within 50 reviews a day: expected loss (one tuned
+  threshold), probability cut-offs, rules levels, approve-all. All tuned on April.
+- The chosen policy frozen to `reports/policy_frozen.json` before the test month was read;
+  `reports/policy.md` (generated) with the test month, validation, the ranking
+  comparison and a 14-row sensitivity table; `exports/daily_policy_results.csv` for
+  the dashboard (daily aggregates only).
+
+Headline: on May 2018 the chosen policy catches 60.4% of fraud value at $270,554,
+against $474,219 for the rules baseline (16.1% caught).
+
+Fixed on the way: the ranking comparison measured the saving against the wrong
+alternative (see DECISIONS.md); fixed on validation only, no extra test read.

@@ -1,0 +1,63 @@
+# The cost model. Every number is an assumption, in US dollars (the data's currency),
+# with its rationale here and in DECISIONS.md. `range` gives the values the sensitivity
+# table in reports/policy.md sweeps; the policy is re-chosen on validation for each.
+
+# A missed fraud: the merchant refunds the full amount when the chargeback arrives...
+chargeback_fee:
+  value: 20.0
+  range: [10.0, 50.0]
+  rationale: >
+    Card processors charge a fixed fee per dispute on top of the refunded amount, typically
+    $15 to $25 in the US (Stripe's published US dispute fee is $15), and handling the
+    dispute takes staff time. $20 covers the fee plus a little handling; the range runs from
+    a low processor fee to a fully loaded cost with representment work.
+
+# ...and a manual review costs analyst time.
+review_cost:
+  value: 7.0
+  range: [3.0, 15.0]
+  rationale: >
+    About 10 minutes of a fraud analyst at a loaded cost of about $40 an hour: checking the
+    order, the device and the customer's history, sometimes a call. Simple queues run
+    faster (5 minutes at $35/h is about $3); complex ones slower (15 minutes at $60/h).
+
+# What a reviewed fraud case ends as.
+review_catch_rate:
+  value: 0.9
+  range: [0.8, 1.0]
+  rationale: >
+    Analysts stop most but not all of the fraud they review; 90% is a working assumption
+    for a queue of high-risk card-not-present orders.
+
+# A legitimate customer who is declined: the lost margin on the sale plus a fixed cost for
+# the damage to the relationship (support contact, some customers do not come back).
+decline_margin: # share of the amount
+  value: 0.25
+  range: [0.10, 0.50]
+  rationale: >
+    The merchant loses the profit on the sale, not the whole amount: 25% is a mid-range
+    retail gross margin; 10% suits thin-margin goods and 50% digital goods and services.
+decline_fixed:
+  value: 10.0
+  range: [0.0, 25.0]
+  rationale: >
+    A falsely declined customer may call support or shop elsewhere next time. $10 is a
+    small expected share of a customer's future margin; the range spans ignoring it to a
+    heavier penalty.
+
+# A legitimate customer whose order is held for review and then approved.
+review_delay_friction:
+  value: 2.0
+  range: [0.0, 5.0]
+  rationale: >
+    A held order is delivered late and a few customers cancel or complain. Much smaller
+    than a decline, since the sale goes through.
+
+# How many manual reviews the team can do per day.
+review_capacity_per_day:
+  value: 50
+  range: [25, 100]
+  rationale: >
+    About one analyst: 50 reviews of 10 minutes is a little over eight hours. The
+    validation month averages 2,788 transactions a day, so this is 1.8% of volume, while
+    fraud is 3.4% of transactions: capacity binds, and what goes to review matters.

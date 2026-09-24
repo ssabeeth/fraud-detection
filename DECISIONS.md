@@ -243,3 +243,69 @@ separate population.
 diagnostic, then the metrics and diagnostic together in one final run; the models did
 not change between reads). `fraud evaluate --report-only` now re-renders the report from
 saved metrics, so wording fixes no longer need a test read.
+
+## 2026-09-24 — Cost model: three actions, seven assumptions, all in USD
+
+**Decision:** approve, decline or review, costed as in `configs/costs.yaml`: a missed
+fraud loses the amount plus a $20 chargeback fee; a review costs $7 of analyst time,
+stops 90% of the fraud it sees and costs a good customer $2 of delay; a false decline
+costs 25% of the amount (lost margin) plus $10 (the relationship). Each value has its
+rationale in the file and a range that the sensitivity table sweeps.
+
+**Options considered for a false decline:** (a) the full amount; (b) a fixed amount;
+(c) margin share plus a fixed amount. (a) overstates it (the merchant keeps the goods);
+(b) ignores that declining a $2,000 order loses more than a $20 one. (c) keeps both.
+
+## 2026-09-24 — Review capacity: 50 a day, allocated in arrival order
+
+**Decision:** one analyst's day (50 reviews of about 10 minutes). The policies decide
+one transaction at a time, as a stream would: a case qualifies for review if its value
+clears the policy's threshold, and it gets a slot only if the day's queue has room. No
+policy sees the rest of the day. The threshold is what saves slots for large cases, and
+it is tuned on validation. A "top 50 of the day" version with hindsight is used only to
+compare the two rankings on equal terms (rule 8), never as a result.
+
+## 2026-09-24 — The expected-loss policy and its review ranking
+
+**Decision:** decline when the expected cost of declining is lower than that of
+approving; review when the expected saving of a review over the better of the two is
+above a threshold. The saving is `min(p × (amount + fee), (1 − p) × friction) − (review
+cost + p × (1 − catch) × (amount + fee) + (1 − p) × delay)`; with no fee, a perfect
+analyst and no delay cost it is exactly `p × amount − review cost`, the brief's formula
+(a test checks this). Only one number is tuned: the review threshold.
+
+**Alternatives kept as comparisons:** probability cut-offs for decline and review (two
+thresholds tuned on validation for money), and the rules baseline with a decline level and
+a review level (tuned the same way). All are tuned on April with the same cost model and
+capacity, so the comparison is between decision methods, not tuning effort.
+
+## 2026-09-24 — Freezing the policy before the test month
+
+The chosen policy (cheapest on validation among the model policies) and the rules
+baseline's settings are written to `reports/policy_frozen.json` before the test month is
+read. The streaming processor and the API load the policy from that file, so the online
+path runs exactly what was chosen.
+
+## 2026-09-24 — Result: the headline, and a bug in the ranking comparison
+
+**Headline (test month, May 2018, generated in `reports/policy.md`):** the frozen
+expected-loss policy on LightGBM catches 60.4% of fraud value at a total cost of
+$270,554, against $474,219 for the rules baseline, which catches 16.1%: $203,664 (43%)
+less. Approving everything would have cost $539,636. The policy is cheaper than the
+rules at both ends of every cost assumption's range (savings of 39% to 48%).
+
+**Bug found and fixed.** The first version of the rule 8 comparison (review the daily
+top 50, approve the rest) ranked by the saving over the *better of approving and
+declining*, although declining was not allowed in that comparison. That undervalues
+reviewing a likely fraud that a decline would have handled, and the probability ranking
+appeared to win ($348,854 against $395,104). Measured against approving, which is the
+only alternative there, the expected-saving ranking costs $287,562 against $348,854. The
+fix touched the validation-only comparison; the frozen policy was not affected (it can
+decline, so its saving is correctly measured against the better of the two), and
+`fraud policy --rerank` re-tuned it on validation, checked it matched the frozen file,
+and re-rendered the report without reading the test month again.
+
+**Also noted:** the rules baseline's tuned setting never declines; with a decline costing
+a quarter of the amount plus $10, its points are not sharp enough for a decline to pay.
+Logistic regression's policy declines 2,544 transactions on May, 2,187 of them
+legitimate: the busy pseudo-card again (phase 4 finding).
