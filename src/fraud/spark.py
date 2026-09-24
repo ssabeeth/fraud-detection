@@ -32,8 +32,10 @@ def on_databricks() -> bool:
     return "DATABRICKS_RUNTIME_VERSION" in os.environ
 
 
-def get_spark(app_name: str = "fraud", *, shuffle_partitions: int | None = None) -> SparkSession:
-    """Return the active session, or build a local one with Delta."""
+def get_spark(
+    app_name: str = "fraud", *, shuffle_partitions: int | None = None, kafka: bool = False
+) -> SparkSession:
+    """Return the active session, or build a local one with Delta (and Kafka if asked)."""
     active = SparkSession.getActiveSession()
     if active is not None:
         return active
@@ -49,6 +51,8 @@ def get_spark(app_name: str = "fraud", *, shuffle_partitions: int | None = None)
         SparkSession.builder.appName(app_name)
         .master(os.environ.get("FRAUD_SPARK_MASTER", "local[*]"))
         .config("spark.driver.memory", memory)
+        # Modelling pulls the feature table into pandas (1.2 GB for the training months).
+        .config("spark.driver.maxResultSize", os.environ.get("FRAUD_SPARK_MAX_RESULT", "4g"))
         .config("spark.sql.shuffle.partitions", str(partitions))
         .config("spark.sql.session.timeZone", "UTC")
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
@@ -61,6 +65,11 @@ def get_spark(app_name: str = "fraud", *, shuffle_partitions: int | None = None)
         .config("spark.databricks.delta.snapshotPartitions", "2")
         .config("spark.driver.extraJavaOptions", "-Duser.timezone=UTC")
     )
-    spark = configure_spark_with_delta_pip(builder).getOrCreate()
+    extra = []
+    if kafka:
+        import pyspark
+
+        extra.append(f"org.apache.spark:spark-sql-kafka-0-10_2.13:{pyspark.__version__}")
+    spark = configure_spark_with_delta_pip(builder, extra_packages=extra).getOrCreate()
     spark.sparkContext.setLogLevel("WARN")
     return spark
