@@ -556,3 +556,20 @@ apply). Their code is complete and checked without credentials, so they are merg
 `main` with tags that say so (`v0.9-databricks-ready`, `v0.10-azure-ready`), and phases
 11 and 12, which need no accounts, go ahead. `v1.0` is left for when the owner has run
 the Databricks job, applied the Terraform and published the dashboard.
+
+## 2026-09-24 — Azure slice: Container Apps on the Consumption plan, budget first
+
+**Options:** Azure Container Apps (Consumption), Azure Container Instances, App Service,
+Azure Functions. **Decision:** Container Apps with `min_replicas = 0`: it runs the same
+image as local Docker, scales to zero when idle (billed per vCPU- and GiB-second above a
+monthly free grant), and its environment has no fixed fee. Container Instances bill while
+running, App Service plans bill while idle, and Functions would need the API rewritten.
+No Log Analytics workspace (ingestion is billed) and no container registry (the image is
+public on GitHub Container Registry). A resource-group budget with e-mail alerts at 50%
+of actual and 100% of forecast spend is applied first, on its own
+(`terraform apply -target=...`), before anything that could cost money.
+
+**Status:** not applied. It needs the owner's Azure account and `az login`. CI runs
+`terraform fmt -check`, `init -backend=false`, `validate` and `tflint` (azurerm ruleset)
+with no credentials; all pass locally. The provider lock file covers linux_amd64,
+darwin_arm64 and darwin_amd64 so CI verifies the same provider build.

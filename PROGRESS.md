@@ -27,7 +27,7 @@ the owner can do".
 | 7. Streaming | done | `v0.7-streaming` |
 | 8. Serving and monitoring | done | `v0.8` |
 | 9. Databricks | ready; needs the owner's workspace login to deploy | `v0.9-databricks-ready` |
-| 10. Cloud slice with Terraform | not started | |
+| 10. Cloud slice with Terraform | ready; needs the owner's Azure login to apply | `v0.10-azure-ready` |
 | 11. Business dashboard | not started | |
 | 12. README | not started | |
 
@@ -208,3 +208,13 @@ serverless; `make databricks-deploy`, `make databricks-upload`, `make databricks
 The wheel was built and run outside the repository (packaged configs, `--data-dir`).
 Blocked on: the owner's Free Edition workspace and `databricks auth login` (none on this
 machine). The Databricks CLI (v1.17.0) is installed.
+
+### Phase 10 — Cloud slice with Terraform (2026-09-24): ready, not applied
+
+Done: `infra/azure/` (resource group, budget alert, Container Apps environment, a
+scale-to-zero Container App running `ghcr.io/ssabeeth/fraud-api`), `terraform.tfvars.example`,
+`docs/deploy_azure.md` (budget-first apply, test, destroy), CI job `terraform` (fmt,
+validate, tflint; no credentials), `make tf-check`. Terraform 1.16.4 installed via
+Homebrew; tflint runs from its official Docker image locally (no Homebrew formula).
+Blocked on: the owner's Azure account and `az login` (Azure CLI not installed), and the
+GitHub repository existing so CI can publish the image.
