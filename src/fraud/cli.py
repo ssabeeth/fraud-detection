@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+from datetime import date
 from pathlib import Path
 
 from fraud import __version__
@@ -139,6 +140,17 @@ def _cmd_policy(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_stream(args: argparse.Namespace) -> int:
+    from fraud.stream.run import run_all
+
+    s = settings()
+    start = args.start or s.split.test.start
+    end = args.end or s.split.test.end
+    result = run_all(s, start, end, args.speedup)
+    print(json.dumps({"processor": result["processor"], "parity": result["parity"]}, default=str))
+    return 1 if result["parity"]["feature_mismatches"] else 0
+
+
 def _cmd_explain(_: argparse.Namespace) -> int:
     from fraud.explain.experiment import run
     from fraud.spark import get_spark
@@ -229,6 +241,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("explain", help="explainable-only model, segment checks, global SHAP")
     p.set_defaults(func=_cmd_explain)
+
+    p = sub.add_parser("stream", help="replay a period through Redpanda and the processor")
+    p.add_argument("--start", type=date.fromisoformat, default=None)
+    p.add_argument("--end", type=date.fromisoformat, default=None)
+    p.add_argument("--speedup", type=float, default=0.0, help="0 = as fast as possible")
+    p.set_defaults(func=_cmd_stream)
 
     p = sub.add_parser("cards", help="write docs/model_card.md and docs/data_card.md")
     p.set_defaults(func=_cmd_cards)
