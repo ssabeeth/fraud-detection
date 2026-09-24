@@ -1,0 +1,20 @@
+{
+  "rows_compared": 590540,
+  "features_compared": 24,
+  "values_compared": 14172960,
+  "mismatches": 0,
+  "mismatches_by_feature": {},
+  "splits": [
+    "test",
+    "train",
+    "valid"
+  ],
+  "events_replayed": 590540,
+  "online_seconds": 5.3,
+  "online_events_per_second": 112478,
+  "online_keys": {
+    "card_key": 217850,
+    "device_key": 9500,
+    "email_key": 59
+  }
+}

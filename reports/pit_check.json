@@ -1,0 +1,8 @@
+{
+  "rows_checked": 4495,
+  "fraud_rows_checked": 899,
+  "features_checked": 17,
+  "values_compared": 76415,
+  "differences": 0,
+  "differences_by_feature": {}
+}
