@@ -1,0 +1,9 @@
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/**
+!configs/**
+!docker/model/**
+!reports/policy_frozen.json
+**/__pycache__

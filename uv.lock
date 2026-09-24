@@ -615,10 +615,8 @@ name = "fraud"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pyarrow" },
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
@@ -629,6 +627,7 @@ kaggle = [
 ]
 ml = [
     { name = "lightgbm" },
+    { name = "matplotlib" },
     { name = "mlflow" },
     { name = "scikit-learn" },
 ]
@@ -645,6 +644,8 @@ serve = [
 ]
 spark = [
     { name = "delta-spark" },
+    { name = "matplotlib" },
+    { name = "pyarrow" },
     { name = "pyspark" },
 ]
 stream = [
@@ -654,6 +655,7 @@ stream = [
 [package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
+    { name = "pyarrow" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -669,12 +671,13 @@ requires-dist = [
     { name = "kaggle", marker = "extra == 'kaggle'", specifier = ">=1.6" },
     { name = "lightgbm", marker = "extra == 'ml'", specifier = ">=4.5" },
     { name = "lightgbm", marker = "extra == 'serve'", specifier = ">=4.5" },
-    { name = "matplotlib", specifier = ">=3.9" },
+    { name = "matplotlib", marker = "extra == 'ml'", specifier = ">=3.9" },
+    { name = "matplotlib", marker = "extra == 'spark'", specifier = ">=3.9" },
     { name = "mlflow", marker = "extra == 'ml'", specifier = ">=3.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "pandas", specifier = ">=2.2,<3" },
     { name = "prometheus-client", marker = "extra == 'serve'", specifier = ">=0.20" },
-    { name = "pyarrow", specifier = ">=17" },
+    { name = "pyarrow", marker = "extra == 'spark'", specifier = ">=17" },
     { name = "pydantic", specifier = ">=2.8" },
     { name = "pyspark", marker = "extra == 'spark'", specifier = ">=4.0.1" },
     { name = "pyyaml", specifier = ">=6.0" },
@@ -687,6 +690,7 @@ provides-extras = ["spark", "ml", "stream", "serve", "monitor", "kaggle"]
 [package.metadata.requires-dev]
 dev = [
     { name = "pre-commit", specifier = ">=4.0" },
+    { name = "pyarrow", specifier = ">=17" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-cov", specifier = ">=5.0" },
     { name = "ruff", specifier = ">=0.7" },
