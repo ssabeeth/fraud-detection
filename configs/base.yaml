@@ -14,7 +14,7 @@ anchor: "2017-11-30T00:00:00"
 split:
   train: ["2017-12-01", "2018-04-01"]   # months 1-4
   valid: ["2018-04-01", "2018-05-01"]   # month 5: all tuning, thresholds and the policy
-  test: ["2018-05-01", "2018-06-02"]    # month 6: touched once per reported result
+  test: ["2018-05-01", "2018-06-01"]    # month 6: touched once per reported result
 
 # Chargebacks arrive late. A label becomes visible this many days after its
 # transaction, in the stream simulation and in monitoring.
