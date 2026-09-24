@@ -532,3 +532,27 @@ stress scenario the feed-health check raised an alert on 23 May, the first full 
 the silent identity feed, and not once on the real replay; the model's own performance
 barely moved, because identity fields are missing for three quarters of transactions
 anyway.
+
+## 2026-09-24 — Databricks: the local CLI as Jobs from a wheel, on serverless
+
+**Decision:** an Asset Bundle (`databricks.yml`, `databricks/resources.yml`) creates a
+schema, a `raw` volume for the owner's upload, a `lake` volume, and one job whose tasks
+are the same `fraud` CLI commands as the local pipeline, run from the project's wheel
+with `--data-dir /Volumes/workspace/fraud/lake`. The wheel carries `configs/` (packaged as
+`fraud/_configs`), so it runs without the repository; MLflow switches to the workspace
+tracking server and the Unity Catalog registry when it detects Databricks. Nothing is
+downloaded inside the workspace, which Free Edition would block anyway. A test parses
+every task's parameters with the real CLI parser, so the bundle cannot drift from it.
+
+**Status:** not deployed. It needs the owner's Free Edition workspace and
+`databricks auth login`, which the brief lists as the owner's. `databricks bundle
+validate` also needs that login, so the bundle is checked offline only: the wheel was
+built, installed into a clean environment and run outside the repository.
+
+## 2026-09-24 — Merging phases that are ready but not deployed
+
+Phases 9 and 10 need the owner's accounts to finish (a Databricks run, a Terraform
+apply). Their code is complete and checked without credentials, so they are merged into
+`main` with tags that say so (`v0.9-databricks-ready`, `v0.10-azure-ready`), and phases
+11 and 12, which need no accounts, go ahead. `v1.0` is left for when the owner has run
+the Databricks job, applied the Terraform and published the dashboard.
