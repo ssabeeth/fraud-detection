@@ -1,0 +1,31 @@
+{
+  "chosen": "lightgbm_expected_loss",
+  "policy": {
+    "type": "ExpectedLossPolicy",
+    "score": "score_lightgbm",
+    "review_threshold": 21.087669946167694,
+    "name": "Expected loss"
+  },
+  "rules_baseline": {
+    "type": "RulesPolicy",
+    "score": "score_rules",
+    "decline_at": null,
+    "review_at": 3.0030849490677967,
+    "name": "Rules baseline"
+  },
+  "costs": {
+    "chargeback_fee": 20.0,
+    "review_cost": 7.0,
+    "review_catch_rate": 0.9,
+    "decline_margin": 0.25,
+    "decline_fixed": 10.0,
+    "review_delay_friction": 2.0,
+    "review_capacity_per_day": 50
+  },
+  "models": {
+    "rules": "rules",
+    "logreg": "logreg",
+    "lightgbm": 3175
+  },
+  "chosen_on": "validation month (April 2018)"
+}
