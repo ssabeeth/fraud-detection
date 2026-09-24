@@ -41,6 +41,12 @@ lakehouse: ## Rebuild silver, gold and the data profile from bronze
 	$(UV) run fraud gold
 	$(UV) run fraud profile
 
+.PHONY: features
+features: ## Point-in-time features, the point-in-time check and online/offline parity
+	$(UV) run fraud features
+	$(UV) run fraud check-pit --sample 3000
+	$(UV) run fraud check-parity
+
 .PHONY: fixtures
 fixtures: ## Regenerate the synthetic CI fixtures
 	$(UV) run python scripts/make_fixtures.py

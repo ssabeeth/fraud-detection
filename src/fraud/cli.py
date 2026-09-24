@@ -76,6 +76,40 @@ def _cmd_profile(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_features(_: argparse.Namespace) -> int:
+    from fraud.features.offline import build_features
+    from fraud.spark import get_spark
+
+    print(build_features(get_spark("features"), settings()))
+    return 0
+
+
+def _cmd_check_pit(args: argparse.Namespace) -> int:
+    from fraud.features.pit import check
+    from fraud.spark import get_spark
+
+    diffs = check(get_spark("pit"), settings(), sample=args.sample or None, report=args.report)
+    for d in diffs[:20]:
+        print("DIFF", d)
+    return 1 if diffs else 0
+
+
+def _cmd_check_parity(args: argparse.Namespace) -> int:
+    from fraud.features.parity import check
+    from fraud.spark import get_spark
+
+    result = check(get_spark("parity"), settings(), set(args.splits), report=args.report)
+    return 1 if result["mismatches"] else 0
+
+
+def _cmd_catalogue(args: argparse.Namespace) -> int:
+    from fraud.features.catalogue import render
+
+    args.out.write_text(render())
+    print(args.out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fraud", description=__doc__)
     parser.add_argument("--version", action="version", version=f"fraud {__version__}")
@@ -104,6 +138,22 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--out", type=Path, default=REPO_ROOT / "reports")
     p.set_defaults(func=_cmd_profile)
 
+    p = sub.add_parser("features", help="gold -> point-in-time feature table")
+    p.set_defaults(func=_cmd_features)
+
+    p = sub.add_parser("check-pit", help="recompute sampled features from raw history")
+    p.add_argument("--sample", type=int, default=3000, help="rows to check (0 = all)")
+    p.add_argument("--report", type=Path, default=REPO_ROOT / "reports" / "pit_check.json")
+    p.set_defaults(func=_cmd_check_pit)
+
+    p = sub.add_parser("check-parity", help="replay through the online features and compare")
+    p.add_argument("--splits", nargs="+", default=["train", "valid", "test"])
+    p.add_argument("--report", type=Path, default=REPO_ROOT / "reports" / "parity_check.json")
+    p.set_defaults(func=_cmd_check_parity)
+
+    p = sub.add_parser("catalogue", help="write docs/features.md from the definitions")
+    p.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "features.md")
+    p.set_defaults(func=_cmd_catalogue)
     return parser
 
 

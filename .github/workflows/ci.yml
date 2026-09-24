@@ -66,6 +66,9 @@ jobs:
       - run: uv run --no-sync fraud bronze --raw-dir tests/fixtures --keep-source
       - run: uv run --no-sync fraud silver
       - run: uv run --no-sync fraud gold
+      - run: uv run --no-sync fraud features
+      - run: uv run --no-sync fraud check-pit --sample 0 --report /tmp/fraud-data/pit.json
+      - run: uv run --no-sync fraud check-parity --report /tmp/fraud-data/parity.json
 
   compose:
     runs-on: ubuntu-latest
