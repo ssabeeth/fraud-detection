@@ -47,6 +47,14 @@ features: ## Point-in-time features, the point-in-time check and online/offline 
 	$(UV) run fraud check-pit --sample 3000
 	$(UV) run fraud check-parity
 
+.PHONY: train
+train: ## Fit the rules baseline, logistic regression and LightGBM (tuned on validation)
+	$(UV) run fraud train
+
+.PHONY: evaluate
+evaluate: ## Score the frozen models on validation and, once, on test; reports/model.md
+	$(UV) run fraud evaluate
+
 .PHONY: fixtures
 fixtures: ## Regenerate the synthetic CI fixtures
 	$(UV) run python scripts/make_fixtures.py
