@@ -59,6 +59,11 @@ evaluate: ## Score the frozen models on validation and, once, on test; reports/m
 policy: ## Choose the policy on validation, freeze it, report it on test; reports/policy.md
 	$(UV) run fraud policy
 
+.PHONY: explain
+explain: ## Explainable-only model, segment checks, SHAP; then the model and data cards
+	$(UV) run fraud explain
+	$(UV) run fraud cards
+
 .PHONY: fixtures
 fixtures: ## Regenerate the synthetic CI fixtures
 	$(UV) run python scripts/make_fixtures.py

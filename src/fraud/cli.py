@@ -139,6 +139,23 @@ def _cmd_policy(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_explain(_: argparse.Namespace) -> int:
+    from fraud.explain.experiment import run
+    from fraud.spark import get_spark
+
+    result = run(get_spark("explain"), settings())
+    print(json.dumps({k: round(v["test"]["total_cost"]) for k, v in result["comparison"].items()}))
+    return 0
+
+
+def _cmd_cards(_: argparse.Namespace) -> int:
+    from fraud.explain.cards import write_cards
+
+    for path in write_cards():
+        print(path)
+    return 0
+
+
 def _cmd_catalogue(args: argparse.Namespace) -> int:
     from fraud.features.catalogue import render
 
@@ -209,6 +226,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="recompute only the validation ranking comparison and re-render the report",
     )
     p.set_defaults(func=_cmd_policy)
+
+    p = sub.add_parser("explain", help="explainable-only model, segment checks, global SHAP")
+    p.set_defaults(func=_cmd_explain)
+
+    p = sub.add_parser("cards", help="write docs/model_card.md and docs/data_card.md")
+    p.set_defaults(func=_cmd_cards)
 
     p = sub.add_parser("catalogue", help="write docs/features.md from the definitions")
     p.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "features.md")
