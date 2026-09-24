@@ -1,0 +1,97 @@
+{
+  "splits": [
+    {
+      "split": "train",
+      "first_day": "2017-12-01",
+      "last_day": "2018-03-31",
+      "transactions": 417559,
+      "fraud": 14721,
+      "fraud_rate": 0.03525489811020718,
+      "amount_usd": 56231236.76200939,
+      "fraud_usd": 2156344.0480000027,
+      "identity_share": 0.265030810017267
+    },
+    {
+      "split": "valid",
+      "first_day": "2018-04-01",
+      "last_day": "2018-04-30",
+      "transactions": 83655,
+      "fraud": 2828,
+      "fraud_rate": 0.03380551072858765,
+      "amount_usd": 11257171.415002069,
+      "fraud_usd": 450144.87800000043,
+      "identity_share": 0.17651066881836114
+    },
+    {
+      "split": "test",
+      "first_day": "2018-05-01",
+      "last_day": "2018-05-31",
+      "transactions": 89326,
+      "fraud": 3114,
+      "fraud_rate": 0.03486107068490697,
+      "amount_usd": 12250540.558001913,
+      "fraud_usd": 477355.93400000024,
+      "identity_share": 0.21047623312361463
+    }
+  ],
+  "months": [
+    {
+      "event_month": "2017-12",
+      "transactions": 137321,
+      "fraud_rate": 0.02585183620859155,
+      "fraud_usd": 480521.7459999998
+    },
+    {
+      "event_month": "2018-01",
+      "transactions": 92585,
+      "fraud_rate": 0.0400172814170762,
+      "fraud_usd": 511259.95500000054
+    },
+    {
+      "event_month": "2018-02",
+      "transactions": 86021,
+      "fraud_rate": 0.04007161042071122,
+      "fraud_usd": 483113.4880000001
+    },
+    {
+      "event_month": "2018-03",
+      "transactions": 101632,
+      "fraud_rate": 0.03954463161209068,
+      "fraud_usd": 681448.8590000016
+    },
+    {
+      "event_month": "2018-04",
+      "transactions": 83655,
+      "fraud_rate": 0.03380551072858765,
+      "fraud_usd": 450144.87800000043
+    },
+    {
+      "event_month": "2018-05",
+      "transactions": 89326,
+      "fraud_rate": 0.03486107068490697,
+      "fraud_usd": 477355.93400000024
+    }
+  ],
+  "card_key": {
+    "rows": 590540,
+    "keys": 217850,
+    "rows_per_key_median": 1.0,
+    "rows_per_key_p90": 6.0,
+    "rows_per_key_p99": 20.0,
+    "rows_per_key_max": 1414,
+    "share_rows_in_repeat_keys": 0.7879533985843465,
+    "share_rows_with_missing_addr1_or_d1": 0.11310664815253836,
+    "repeat_keys": 92628,
+    "repeat_keys_card_fields_constant": 0.9659498207885304,
+    "repeat_keys_email_constant": 0.7144060111413395,
+    "repeat_keys_mixed_labels": 0.03359675260180507,
+    "key_pairs_by_first_seen_gap": {
+      "1": 44053,
+      "2": 43374,
+      "3": 42963,
+      "4": 42466,
+      "5": 41974
+    },
+    "one_day_pairs_excess_over_2_5_day_mean": 1358.75
+  }
+}
