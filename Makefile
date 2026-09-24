@@ -64,6 +64,10 @@ explain: ## Explainable-only model, segment checks, SHAP; then the model and dat
 	$(UV) run fraud explain
 	$(UV) run fraud cards
 
+.PHONY: stream
+stream: up ## Replay the test month through Redpanda, the processor and the Spark sink
+	$(UV) run fraud stream
+
 .PHONY: fixtures
 fixtures: ## Regenerate the synthetic CI fixtures
 	$(UV) run python scripts/make_fixtures.py
