@@ -1,18 +1,45 @@
 # Progress
 
-**Status: phase 8 (serving and monitoring) done, tag `v0.8`; phases 9 and 10 need the owner's accounts.**
+**Status (2026-09-24): phases 1-8, 11 and 12 done; phases 9 and 10 written and checked
+without credentials, waiting for the owner's accounts. Nothing has been pushed: the
+GitHub repository does not exist yet.** Every result is from the real data and is in
+`reports/`; the headline is in the README.
 
-The GitHub remote does not exist yet: creating the public repository was blocked by
-the session's permission settings, so all work is committed locally. See "What only
-the owner can do".
+## Stopped for the owner: exact situation and next steps
 
-## What only the owner can do
+1. **Create the GitHub repository and push.** Creating a public repository was blocked
+   by this session's permission settings, so all work is committed locally on `main`
+   with tags `v0.1-scaffold` to `v0.12-readme`. From this folder:
 
-1. **Create the GitHub repository and push.** Run `gh repo create ssabeeth/fraud-detection --public --source . --push`
-   from this folder (or allow Claude to), then `git push origin --all && git push origin --tags`.
-2. **Expire the Kaggle API token** that was pasted into the chat on 2026-09-24
-   (kaggle.com → Settings → API). The download used `kaggle auth login` instead, so the
-   token was never stored or used.
+   ```bash
+   gh repo create ssabeeth/fraud-detection --public --source . --remote origin
+   git push origin main --tags
+   ```
+
+   Then check the CI run (the `image` job publishes `ghcr.io/ssabeeth/fraud-api` with a
+   model trained on synthetic data) and make that package public in GitHub (Packages →
+   fraud-api → settings), which the Azure step needs.
+2. **Expire the Kaggle API token** that was pasted into the chat (kaggle.com → Settings
+   → API). The download used `kaggle auth login` instead; the pasted token was never
+   stored or used.
+3. **Databricks (phase 9).** Create a Free Edition workspace, then
+   `databricks auth login --host https://<workspace>.cloud.databricks.com`, then
+   `make databricks-deploy databricks-upload databricks-run` (see `docs/databricks.md`).
+4. **Azure (phase 10).** Create an account, `brew install azure-cli`, `az login`, copy
+   `infra/azure/terraform.tfvars.example` to `terraform.tfvars` and fill it in, then apply
+   the budget first and the rest second, exactly as in `docs/deploy_azure.md`. Destroy
+   with `terraform destroy` when done.
+5. **Tableau (phase 11).** Build and publish the dashboard from
+   `exports/daily_policy_results.csv` following `docs/tableau.md`; add the link to the
+   README.
+6. When 3-5 are done, update this file and the README and tag `v1.0`.
+
+**Local machine state.** Installed with Homebrew: `openjdk@17`, `terraform` 1.16.4,
+the Databricks CLI (v1.17.0); Colima and Docker were already there (Colima is stopped
+at the end of the session). `data/` holds the only copy of the data (the Delta lake,
+745 MB; 1.1 GB with the models, the MLflow store and the monitoring HTML); the Kaggle CSVs were
+deleted after bronze. Kaggle credentials are in `~/.kaggle/credentials.json` from
+`kaggle auth login`.
 
 ## Phase status
 
@@ -23,13 +50,14 @@ the owner can do".
 | 3. Features | done | `v0.3-features` |
 | 4. Modelling | done | `v0.4-modelling` |
 | 5. Decision policy and money | done | `v0.5-policy` |
+| Fix: depth-limited LightGBM, phases 4-5 re-reported | done | `v0.5.1-depth-limit` |
 | 6. Explainability and governance | done | `v0.6-explainability` |
 | 7. Streaming | done | `v0.7-streaming` |
 | 8. Serving and monitoring | done | `v0.8` |
 | 9. Databricks | ready; needs the owner's workspace login to deploy | `v0.9-databricks-ready` |
 | 10. Cloud slice with Terraform | ready; needs the owner's Azure login to apply | `v0.10-azure-ready` |
 | 11. Business dashboard | export and guide done; the owner builds and publishes | `v0.11-dashboard` |
-| 12. README | not started | |
+| 12. README | done (`v1.0` waits for 9-11's owner steps) | `v0.12-readme` |
 
 ## Log
 
@@ -225,3 +253,11 @@ Done: `exports/daily_policy_results.csv` (daily aggregates for every policy on t
 month; a test ties its totals to `reports/policy.md`) and `docs/tableau.md` (step-by-step
 build guide). Owner's step: build and publish in Tableau Public, then add the link to the
 README.
+
+### Phase 12 — README (2026-09-24)
+
+Done: README with the headline, results tables, the correctness checks, architecture
+(Mermaid), how it works, quickstart, decisions, failures kept, known limitations, what
+production would add, the Kaggle-leaderboard caveat and the data licence. Every number
+checked against the generated reports; one claim corrected on the way (four of the
+*five* busiest days fall 20-24 December; 2 March is the second busiest).

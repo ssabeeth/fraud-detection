@@ -40,7 +40,8 @@ an assumption, checked against the data in phase 2 (`reports/data.md`):
 
 - the data then runs from 1 December 2017 to 31 May 2018 23:58 (the last
   `TransactionDT` is 15,811,131 s), six whole calendar months;
-- the four busiest days are 20, 22, 23 and 24 December, a pre-Christmas peak;
+- four of the five busiest days are 20, 22, 23 and 24 December, a pre-Christmas peak
+  (the other is 2 March);
 - Sunday is the quietest weekday and Friday the busiest;
 - `D1` ("days since the card was first seen") was counted on the same day boundary as
   the anchor's midnight. Shifting the boundary by any whole hour from 1 to 23 raises the
