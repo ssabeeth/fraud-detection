@@ -160,6 +160,15 @@ def _cmd_explain(_: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_monitor(_: argparse.Namespace) -> int:
+    from fraud.monitor.run import run
+    from fraud.spark import get_spark
+
+    result = run(get_spark("monitor"), settings())
+    print(json.dumps({k: result[k]["retrain_on"] for k in ("replay", "identity_outage")}))
+    return 0
+
+
 def _cmd_cards(_: argparse.Namespace) -> int:
     from fraud.explain.cards import write_cards
 
@@ -247,6 +256,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--end", type=date.fromisoformat, default=None)
     p.add_argument("--speedup", type=float, default=0.0, help="0 = as fast as possible")
     p.set_defaults(func=_cmd_stream)
+
+    p = sub.add_parser("monitor", help="drift and delayed-label performance on the replay")
+    p.set_defaults(func=_cmd_monitor)
 
     p = sub.add_parser("cards", help="write docs/model_card.md and docs/data_card.md")
     p.set_defaults(func=_cmd_cards)

@@ -76,3 +76,5 @@ htmlcov/
 # Local tooling
 .claude/
 
+# Model bundle copied in for an image build (scripts/build_image.sh)
+docker/model/

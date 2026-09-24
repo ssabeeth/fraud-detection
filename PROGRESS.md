@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 7 (streaming) done; phase 8 (serving and monitoring) next.**
+**Status: phase 8 (serving and monitoring) done, tag `v0.8`; phases 9 and 10 need the owner's accounts.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -25,7 +25,7 @@ the owner can do".
 | 5. Decision policy and money | done | `v0.5-policy` |
 | 6. Explainability and governance | done | `v0.6-explainability` |
 | 7. Streaming | done | `v0.7-streaming` |
-| 8. Serving and monitoring | not started | |
+| 8. Serving and monitoring | done | `v0.8` |
 | 9. Databricks | not started | |
 | 10. Cloud slice with Terraform | not started | |
 | 11. Business dashboard | not started | |
@@ -175,3 +175,27 @@ Fixed on the way: the first LightGBM needed 162 ms per decision for its SHAP rea
 so trees are now capped at depth 8 (see the fix entry above); the sink checkpoint would
 have skipped a second replay's messages; the producer held a month of 430-field dicts in
 memory at once.
+
+### Phase 8 — Serving and monitoring (2026-09-24)
+
+Done:
+- FastAPI service (`fraud.serve.app`): `/score` computes the point-in-time features
+  from the history supplied with the request (same online code as the processor),
+  scores, returns the top three reasons and the recommended action; `/health`;
+  `/metrics` (Prometheus: requests, actions, latency, score histogram). History after the
+  transaction is rejected with 422.
+- Docker image (`docker/Dockerfile`, `make image`): the model and frozen policy baked in;
+  base dependencies slimmed so the Python environment is 416 MB. Smoke-tested locally
+  with the real model (not published); CI builds and publishes it with a fixture-trained
+  model only.
+- Monitoring (`fraud monitor`, `reports/monitoring.md`): daily Evidently drift on inputs
+  and PSI on scores over 7 days, a daily feed-health check, and per-week performance
+  from labels as they arrive 30 days late; thresholds and the retrain rule in
+  `configs/monitoring.yaml`. Demonstrated on the streamed replay and on a stress
+  scenario (identity feed silent from 22 May).
+
+Results: the drift monitor warned on the velocity features for 16 of 25 days (the busy
+pseudo-card), scores stayed stable (PSI at most 0.011), no retrain triggered, and the
+June cohorts confirmed performance held. The feed-health check caught the stress
+scenario's silent identity feed on its first full day. Fixed on the way: the first
+version only noticed the silent feed after ten days (see DECISIONS.md).

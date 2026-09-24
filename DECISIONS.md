@@ -466,3 +466,69 @@ difference in P(fraud) between the online (NumPy row) and offline (pandas batch)
 1.2e-14; no decision without reasons. One process makes 183 decisions a second (5.4 ms
 each at the median, with SHAP); paced at 1,800× real time the end-to-end latency is
 15.5 ms at the median and 56 ms at the 99th percentile.
+
+## 2026-09-24 — Scoring API: stateless, history in the request
+
+`/score` takes the transaction and the earlier transactions of the same card, device and
+email domain, and computes the features with the same online code as the processor. A
+stateless API is easy to scale and test, and it cannot drift from the processor's
+state; the price is that the caller must supply the history, which in production would
+come from a feature store. History at or after the transaction's time is rejected (422).
+The daily review capacity belongs to the queue, so the API returns
+`review_recommended` and leaves capacity to the processor.
+
+## 2026-09-24 — Monitoring thresholds
+
+- **Score drift:** PSI of P(fraud) against validation deciles; warn at 0.1, alert at 0.2,
+  the conventional bands for PSI.
+- **Input drift:** Evidently's per-column tests (normalised Wasserstein distance for
+  numbers, Jensen-Shannon for categories, each at its 0.1 default), plus a missing-values
+  check (a column's missing share moving by 0.2 or more) because a silent feed shows up as
+  missing values that a distribution test on the remaining values cannot see. Warn when 30%
+  of monitored inputs drift.
+- **Feed health:** on the latest day alone, a field present on at least 5% of
+  reference rows that is present on less than half its usual share raises a feed
+  alert. Added after the first monitoring run: the 7-day drift window caught the stress
+  scenario's silent identity feed only ten days in, and an absolute change in the missing
+  share misses fields that are usually missing. A feed alert means fix the feed; it never
+  triggers a retrain, which would learn from broken inputs.
+- **Alert rate:** warn when declines plus reviews move by half against validation.
+- **Performance:** per weekly cohort, once its labels are all in; alert if PR-AUC falls
+  below 80% of validation's or fraud value caught drops by 10 points.
+- **Retrain:** on a performance alert, or on 7 consecutive days of score-drift alerts
+  backed by an input-drift warning. A single noisy day never triggers it.
+
+The reference is the validation month, the data the policy was chosen on. The windows
+are seven days, long enough to smooth the weekly cycle.
+
+## 2026-09-24 — Stress scenario: the identity feed goes silent
+
+To show the monitors firing, the test month is also replayed in-process through the same
+`OnlineScorer` with every device and identity field blank from 22 May, as when an
+upstream fingerprinting service fails. This is a synthetic change applied to real
+transactions, reported separately from the true replay and never mixed into any result.
+
+## 2026-09-24 — Scoring image: small, model baked in, never the real model in public
+
+**Decision:** `docker/Dockerfile` installs only the base dependencies and the `serve`
+extra (FastAPI, LightGBM, scikit-learn); Spark, Arrow and matplotlib moved out of the
+base set into the extras that use them, which cut the image's Python environment from
+658 MB to 416 MB. The model bundle and the frozen policy are copied in at build time, so
+a container needs no volume or network to start. CI builds the image with a model trained
+on the synthetic fixtures and publishes that one; a model trained on the competition data
+is only ever built locally (`make image`), because a public image is a form of sharing and
+the rules forbid sharing the data.
+
+## 2026-09-24 — Result: what the monitors saw on the replay
+
+Generated in `reports/monitoring.md`. On the streamed test month the input-drift monitor
+warned on 16 of 25 days, driven by the velocity and history features (`card_txn_24h`,
+`card_txn_prior`, `email_txn_7d`): the same shift from the busy pseudo-card and the
+growing card histories that broke logistic regression in phase 4. The score PSI never
+passed 0.011 and the alert rate moved from 4.0% to at most 5.3%, so no retrain was
+triggered; the complete weekly cohorts, known only in June, confirm the model held
+(PR-AUC 0.49 to 0.59 against 0.62 on validation, fraud value caught 56% to 65%). In the
+stress scenario the feed-health check raised an alert on 23 May, the first full day of
+the silent identity feed, and not once on the real replay; the model's own performance
+barely moved, because identity fields are missing for three quarters of transactions
+anyway.

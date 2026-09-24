@@ -1,0 +1,1359 @@
+{
+  "reference": {
+    "pr_auc": 0.6156043335863359,
+    "value_caught": 0.6418367777140406,
+    "alert_rate": 0.03998565537027075
+  },
+  "thresholds": {
+    "window_days": 7,
+    "drifted_share_warn": 0.3,
+    "psi_warn": 0.1,
+    "psi_alert": 0.2,
+    "alert_rate_change_warn": 0.5,
+    "pr_auc_ratio_alert": 0.8,
+    "value_caught_drop_alert": 0.1,
+    "consecutive_score_alert_days": 7,
+    "feed_min_present": 0.05,
+    "feed_drop": 0.5
+  },
+  "outage_from": "2018-05-22",
+  "replay": {
+    "daily": [
+      {
+        "date": "2018-05-08",
+        "transactions": 22018,
+        "drifted_share": 0.06666666666666667,
+        "drifted_columns": [
+          "email_txn_7d"
+        ],
+        "score_psi": 0.0017504973563997812,
+        "alert_rate": 0.04028522118266872,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-09",
+        "transactions": 20967,
+        "drifted_share": 0.06666666666666667,
+        "drifted_columns": [
+          "email_txn_7d"
+        ],
+        "score_psi": 0.0013397288764301404,
+        "alert_rate": 0.04073067200839414,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-10",
+        "transactions": 20740,
+        "drifted_share": 0.2,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.001702488717437743,
+        "alert_rate": 0.03886210221793635,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-11",
+        "transactions": 19811,
+        "drifted_share": 0.2,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.003996752071583443,
+        "alert_rate": 0.04189591641007521,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-12",
+        "transactions": 19692,
+        "drifted_share": 0.26666666666666666,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.005356368657871409,
+        "alert_rate": 0.041996749949217954,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-13",
+        "transactions": 19997,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_txn_24h",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00908983089475517,
+        "alert_rate": 0.04495674351152673,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-14",
+        "transactions": 20726,
+        "drifted_share": 0.4666666666666667,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008955963718512015,
+        "alert_rate": 0.0446299334169642,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-15",
+        "transactions": 20716,
+        "drifted_share": 0.4666666666666667,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.009465033408903391,
+        "alert_rate": 0.04547209886078393,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-16",
+        "transactions": 20802,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008795947624190422,
+        "alert_rate": 0.045139890395154314,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-17",
+        "transactions": 20944,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.009076707342241037,
+        "alert_rate": 0.045454545454545456,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-18",
+        "transactions": 21038,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.007760628000554477,
+        "alert_rate": 0.04482365243844472,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-19",
+        "transactions": 20996,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.006640930549516573,
+        "alert_rate": 0.0440560106686988,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-20",
+        "transactions": 20525,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00436301684240668,
+        "alert_rate": 0.04175395858708891,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-21",
+        "transactions": 20332,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.004542207357712909,
+        "alert_rate": 0.042101121385008856,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-22",
+        "transactions": 20454,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00530980221737965,
+        "alert_rate": 0.04194778527427398,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-23",
+        "transactions": 20389,
+        "drifted_share": 0.4,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_secs_since_prev",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00708088618410122,
+        "alert_rate": 0.0453676001765658,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-24",
+        "transactions": 20206,
+        "drifted_share": 0.4,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_secs_since_prev",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.006909456996002506,
+        "alert_rate": 0.04602593289122043,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-25",
+        "transactions": 19941,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.006060600193939583,
+        "alert_rate": 0.04633669324507297,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-26",
+        "transactions": 19782,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.006970184560249454,
+        "alert_rate": 0.0483773127085229,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-27",
+        "transactions": 19737,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.007330021557400869,
+        "alert_rate": 0.04960226984850788,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-28",
+        "transactions": 19010,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008742100235250624,
+        "alert_rate": 0.05186743819042609,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-29",
+        "transactions": 18027,
+        "drifted_share": 0.13333333333333333,
+        "drifted_columns": [
+          "card_txn_prior",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.011185875154841537,
+        "alert_rate": 0.053308925500637934,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-30",
+        "transactions": 17779,
+        "drifted_share": 0.13333333333333333,
+        "drifted_columns": [
+          "card_txn_prior",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.010299698681145854,
+        "alert_rate": 0.05146521176669104,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-31",
+        "transactions": 17681,
+        "drifted_share": 0.13333333333333333,
+        "drifted_columns": [
+          "card_txn_prior",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.01115649162018523,
+        "alert_rate": 0.05271195068152254,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-01",
+        "transactions": 17752,
+        "drifted_share": 0.06666666666666667,
+        "drifted_columns": [
+          "email_txn_7d"
+        ],
+        "score_psi": 0.01099445679687228,
+        "alert_rate": 0.0534024335286165,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-02",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-03",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-04",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-05",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-06",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-07",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-08",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-09",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-10",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-11",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-12",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-13",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-14",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-15",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-16",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-17",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-18",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-19",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-20",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-21",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-22",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-23",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-24",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-25",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-26",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-27",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-28",
+        "complete_cohorts": 4
+      },
+      {
+        "date": "2018-06-29",
+        "complete_cohorts": 4
+      },
+      {
+        "date": "2018-06-30",
+        "complete_cohorts": 4
+      }
+    ],
+    "cohorts": [
+      {
+        "cohort": "2018-05-01",
+        "transactions": 22018,
+        "labelled": 22018,
+        "complete": true,
+        "pr_auc": 0.5858739948311649,
+        "value_caught": 0.5669743770426318,
+        "fraud_rate": 0.030111726769007176,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-07"
+      },
+      {
+        "cohort": "2018-05-08",
+        "transactions": 20716,
+        "labelled": 20716,
+        "complete": true,
+        "pr_auc": 0.49398273682151056,
+        "value_caught": 0.5575856497895177,
+        "fraud_rate": 0.03099053871403746,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-14"
+      },
+      {
+        "cohort": "2018-05-15",
+        "transactions": 20454,
+        "labelled": 20454,
+        "complete": true,
+        "pr_auc": 0.5253326847930023,
+        "value_caught": 0.5965958827330861,
+        "fraud_rate": 0.03544538965483524,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-21"
+      },
+      {
+        "cohort": "2018-05-22",
+        "transactions": 18027,
+        "labelled": 18027,
+        "complete": true,
+        "pr_auc": 0.5938450426993381,
+        "value_caught": 0.6472806209716837,
+        "fraud_rate": 0.041326898541077274,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-28"
+      },
+      {
+        "cohort": "2018-05-29",
+        "transactions": 8111,
+        "labelled": 8111,
+        "complete": true,
+        "pr_auc": 0.5469247033907595,
+        "value_caught": 0.6073608021673029,
+        "fraud_rate": 0.0417950930834669,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-07-01"
+      }
+    ],
+    "retrain_on": null,
+    "retrain_reason": null,
+    "reference_alert_rate": 0.03998565537027075,
+    "first_feed_alert": null
+  },
+  "identity_outage": {
+    "daily": [
+      {
+        "date": "2018-05-08",
+        "transactions": 22018,
+        "drifted_share": 0.06666666666666667,
+        "drifted_columns": [
+          "email_txn_7d"
+        ],
+        "score_psi": 0.0017504973563997812,
+        "alert_rate": 0.04028522118266872,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-09",
+        "transactions": 20967,
+        "drifted_share": 0.06666666666666667,
+        "drifted_columns": [
+          "email_txn_7d"
+        ],
+        "score_psi": 0.0013397288764301404,
+        "alert_rate": 0.04073067200839414,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-10",
+        "transactions": 20740,
+        "drifted_share": 0.2,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.001702488717437743,
+        "alert_rate": 0.03886210221793635,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-11",
+        "transactions": 19811,
+        "drifted_share": 0.2,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.003996752071583443,
+        "alert_rate": 0.04189591641007521,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-12",
+        "transactions": 19692,
+        "drifted_share": 0.26666666666666666,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.005356368657871409,
+        "alert_rate": 0.041996749949217954,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-13",
+        "transactions": 19997,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_txn_24h",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00908983089475517,
+        "alert_rate": 0.04495674351152673,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-14",
+        "transactions": 20726,
+        "drifted_share": 0.4666666666666667,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008955963718512015,
+        "alert_rate": 0.0446299334169642,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-15",
+        "transactions": 20716,
+        "drifted_share": 0.4666666666666667,
+        "drifted_columns": [
+          "card4",
+          "card6",
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.009465033408903391,
+        "alert_rate": 0.04547209886078393,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-16",
+        "transactions": 20802,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008795947624190422,
+        "alert_rate": 0.045139890395154314,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-17",
+        "transactions": 20944,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.009076707342241037,
+        "alert_rate": 0.045454545454545456,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-18",
+        "transactions": 21038,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.007760628000554477,
+        "alert_rate": 0.04482365243844472,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-19",
+        "transactions": 20996,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.006640930549516573,
+        "alert_rate": 0.0440560106686988,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-20",
+        "transactions": 20525,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00436301684240668,
+        "alert_rate": 0.04175395858708891,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-21",
+        "transactions": 20332,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.004542207357712909,
+        "alert_rate": 0.042101121385008856,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-22",
+        "transactions": 20454,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00530980221737965,
+        "alert_rate": 0.04194778527427398,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-23",
+        "transactions": 20389,
+        "drifted_share": 0.4,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_secs_since_prev",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.00788235456039511,
+        "alert_rate": 0.0448280935798715,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-24",
+        "transactions": 20206,
+        "drifted_share": 0.4,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_secs_since_prev",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008658486594835226,
+        "alert_rate": 0.04498663763238642,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-25",
+        "transactions": 19941,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.008358573809033206,
+        "alert_rate": 0.044882403089112885,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-26",
+        "transactions": 19782,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.01041494012976659,
+        "alert_rate": 0.04590031341623698,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-27",
+        "transactions": 19737,
+        "drifted_share": 0.3333333333333333,
+        "drifted_columns": [
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d"
+        ],
+        "score_psi": 0.01172138572888542,
+        "alert_rate": 0.046764959213659626,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-28",
+        "transactions": 19010,
+        "drifted_share": 0.4666666666666667,
+        "drifted_columns": [
+          "DeviceType",
+          "card_amt_24h",
+          "card_txn_24h",
+          "card_txn_prior",
+          "device_txn_24h",
+          "email_txn_7d",
+          "has_identity"
+        ],
+        "score_psi": 0.018000936037722542,
+        "alert_rate": 0.04844818516570226,
+        "input_drift_warn": true,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-29",
+        "transactions": 18027,
+        "drifted_share": 0.26666666666666666,
+        "drifted_columns": [
+          "DeviceType",
+          "card_txn_prior",
+          "email_txn_7d",
+          "has_identity"
+        ],
+        "score_psi": 0.024716296683193025,
+        "alert_rate": 0.04959227824929273,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-30",
+        "transactions": 17779,
+        "drifted_share": 0.26666666666666666,
+        "drifted_columns": [
+          "DeviceType",
+          "card_txn_prior",
+          "email_txn_7d",
+          "has_identity"
+        ],
+        "score_psi": 0.02268465756343921,
+        "alert_rate": 0.047752966983519884,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-05-31",
+        "transactions": 17681,
+        "drifted_share": 0.26666666666666666,
+        "drifted_columns": [
+          "DeviceType",
+          "card_txn_prior",
+          "email_txn_7d",
+          "has_identity"
+        ],
+        "score_psi": 0.023463403565739428,
+        "alert_rate": 0.04909224591369266,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-01",
+        "transactions": 17752,
+        "drifted_share": 0.2,
+        "drifted_columns": [
+          "DeviceType",
+          "email_txn_7d",
+          "has_identity"
+        ],
+        "score_psi": 0.021783320698149783,
+        "alert_rate": 0.04957187922487607,
+        "input_drift_warn": false,
+        "score_status": "ok",
+        "alert_rate_warn": false,
+        "feed_alerts": [
+          "device_txn_24h",
+          "DeviceType",
+          "has_identity"
+        ],
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-02",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-03",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-04",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-05",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-06",
+        "complete_cohorts": 0
+      },
+      {
+        "date": "2018-06-07",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-08",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-09",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-10",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-11",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-12",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-13",
+        "complete_cohorts": 1
+      },
+      {
+        "date": "2018-06-14",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-15",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-16",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-17",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-18",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-19",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-20",
+        "complete_cohorts": 2
+      },
+      {
+        "date": "2018-06-21",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-22",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-23",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-24",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-25",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-26",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-27",
+        "complete_cohorts": 3
+      },
+      {
+        "date": "2018-06-28",
+        "complete_cohorts": 4
+      },
+      {
+        "date": "2018-06-29",
+        "complete_cohorts": 4
+      },
+      {
+        "date": "2018-06-30",
+        "complete_cohorts": 4
+      }
+    ],
+    "cohorts": [
+      {
+        "cohort": "2018-05-01",
+        "transactions": 22018,
+        "labelled": 22018,
+        "complete": true,
+        "pr_auc": 0.5858739948311649,
+        "value_caught": 0.5669743770426318,
+        "fraud_rate": 0.030111726769007176,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-07"
+      },
+      {
+        "cohort": "2018-05-08",
+        "transactions": 20716,
+        "labelled": 20716,
+        "complete": true,
+        "pr_auc": 0.49398273682151056,
+        "value_caught": 0.5575856497895177,
+        "fraud_rate": 0.03099053871403746,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-14"
+      },
+      {
+        "cohort": "2018-05-15",
+        "transactions": 20454,
+        "labelled": 20454,
+        "complete": true,
+        "pr_auc": 0.5253326847930023,
+        "value_caught": 0.5965958827330861,
+        "fraud_rate": 0.03544538965483524,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-21"
+      },
+      {
+        "cohort": "2018-05-22",
+        "transactions": 18027,
+        "labelled": 18027,
+        "complete": true,
+        "pr_auc": 0.5960452168988309,
+        "value_caught": 0.6366758836929877,
+        "fraud_rate": 0.041326898541077274,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-06-28"
+      },
+      {
+        "cohort": "2018-05-29",
+        "transactions": 8111,
+        "labelled": 8111,
+        "complete": true,
+        "pr_auc": 0.5530795647654532,
+        "value_caught": 0.595769035532487,
+        "fraud_rate": 0.0417950930834669,
+        "pr_auc_alert": false,
+        "value_caught_alert": false,
+        "complete_on": "2018-07-01"
+      }
+    ],
+    "retrain_on": null,
+    "retrain_reason": null,
+    "reference_alert_rate": 0.03998565537027075,
+    "first_feed_alert": {
+      "date": "2018-05-23",
+      "columns": [
+        "device_txn_24h",
+        "DeviceType",
+        "has_identity"
+      ]
+    }
+  }
+}

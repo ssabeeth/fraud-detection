@@ -94,6 +94,60 @@ jobs:
       - run: uv sync --frozen --all-extras
       - run: uv run --no-sync pytest -m kafka -v
 
+  image:
+    # Train a demonstration model on the synthetic fixtures (never on competition data),
+    # build the scoring image with it, smoke-test it, and publish it from main.
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    permissions:
+      contents: read
+      packages: write
+    env:
+      FRAUD_DATA_DIR: /tmp/fraud-data
+      FRAUD_REPORTS_DIR: /tmp/fraud-reports
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6.0.1
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+      - uses: actions/cache@v6.1.0
+        with:
+          path: ~/.ivy2.5.2
+          key: ivy-${{ hashFiles('uv.lock') }}
+      - run: uv sync --frozen --all-extras
+      - name: Demonstration model from the synthetic fixtures
+        run: |
+          uv run --no-sync fraud bronze --raw-dir tests/fixtures --keep-source
+          uv run --no-sync fraud silver
+          uv run --no-sync fraud gold
+          uv run --no-sync fraud features
+          uv run --no-sync fraud train --models lightgbm
+      - name: Build
+        run: scripts/build_image.sh /tmp/fraud-data/models/lightgbm fraud-api:ci
+      - name: Smoke test
+        run: |
+          docker run -d --name api -p 8000:8000 fraud-api:ci
+          for i in $(seq 30); do curl -sf localhost:8000/health && break; sleep 1; done
+          curl -sf localhost:8000/health | grep -q '"status":"ok"'
+          curl -sf -X POST localhost:8000/score -H 'content-type: application/json' \
+            -d '{"transaction":{"TransactionID":1,"TransactionDT":10000000,"TransactionAmt":120.5,"ProductCD":"W","card1":13926,"addr1":315,"D1":14,"P_emaildomain":"gmail.com"}}' \
+            | tee /dev/stderr | grep -q '"reasons"'
+          curl -sf localhost:8000/metrics | grep -q fraud_score_requests_total
+          docker rm -f api
+      - name: Publish to GitHub Container Registry
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          image=ghcr.io/${{ github.repository_owner }}/fraud-api
+          docker tag fraud-api:ci "$image:${{ github.sha }}"
+          docker tag fraud-api:ci "$image:latest"
+          docker push "$image:${{ github.sha }}"
+          docker push "$image:latest"
+
   compose:
     runs-on: ubuntu-latest
     steps:
