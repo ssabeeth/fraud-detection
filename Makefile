@@ -104,6 +104,11 @@ databricks-upload: ## Download the CSVs from Kaggle, upload them to the raw volu
 databricks-run: ## Run phases 2-5 as a Databricks Job and wait for it
 	databricks bundle run fraud_pipeline -t free
 
+.PHONY: tf-check
+tf-check: ## terraform fmt, validate and tflint for infra/azure (no credentials needed)
+	cd infra/azure && terraform fmt -check -recursive && terraform init -backend=false -input=false >/dev/null && terraform validate
+	docker run --rm -v "$(CURDIR)/infra/azure":/data -w /data --entrypoint sh ghcr.io/terraform-linters/tflint:v0.64.0 -c "tflint --init >/dev/null && tflint"
+
 .PHONY: image
 image: ## Build the scoring API image with the local LightGBM bundle
 	scripts/build_image.sh data/models/lightgbm fraud-api:local
