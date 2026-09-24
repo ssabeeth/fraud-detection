@@ -1,0 +1,4 @@
+subscription_id = "00000000-0000-0000-0000-000000000000"
+budget_emails   = ["you@example.com"]
+# image         = "ghcr.io/ssabeeth/fraud-api:v0.10"
+# budget_amount = 5
