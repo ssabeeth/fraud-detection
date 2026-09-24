@@ -15,6 +15,7 @@ from pyspark.sql import functions as F
 
 from fraud.config import Settings
 from fraud.lakehouse.tables import GOLD_TRANSACTIONS, table_path
+from fraud.spark import on_databricks
 
 log = logging.getLogger(__name__)
 
@@ -110,13 +111,15 @@ def card_key_stability(gold: DataFrame) -> dict:
             F.concat_ws("_", F.col("_p")[0], F.col("_p")[1]).alias("ca"),
             F.col("_p")[2].cast("long").alias("first_seen"),
         )
-        .cache()
     )
+    if not on_databricks():
+        keys = keys.cache()
     gaps = {}
     for gap in range(1, 6):
         shifted = keys.select("ca", (F.col("first_seen") - F.lit(gap)).alias("first_seen"))
         gaps[gap] = keys.join(shifted, ["ca", "first_seen"]).count()
-    keys.unpersist()
+    if not on_databricks():
+        keys.unpersist()
     baseline = sum(gaps[g] for g in range(2, 6)) / 4
     return {
         "rows": total,
@@ -146,7 +149,9 @@ def write_report(spark: SparkSession, s: Settings, out_dir: Path) -> dict:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    gold = spark.read.format("delta").load(table_path(s, GOLD_TRANSACTIONS)).cache()
+    gold = spark.read.format("delta").load(table_path(s, GOLD_TRANSACTIONS))
+    if not on_databricks():  # serverless compute does not cache DataFrames
+        gold = gold.cache()
     splits = split_summary(gold)
     months = monthly(gold)
     days = daily(gold)
@@ -158,7 +163,8 @@ def write_report(spark: SparkSession, s: Settings, out_dir: Path) -> dict:
         .orderBy(F.desc("count"))
         .toPandas()
     )
-    gold.unpersist()
+    if not on_databricks():
+        gold.unpersist()
 
     out_dir.mkdir(parents=True, exist_ok=True)
     fig_dir = out_dir / "figures"

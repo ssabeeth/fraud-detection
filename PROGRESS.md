@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 3 (features) done; phase 4 (modelling) next.**
+**Status: phase 4 (modelling) done; phase 5 (decision policy) next.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -21,7 +21,7 @@ the owner can do".
 | 1. Scaffold | done | `v0.1-scaffold` |
 | 2. Data and lakehouse | done | `v0.2-lakehouse` |
 | 3. Features | done | `v0.3-features` |
-| 4. Modelling | not started | |
+| 4. Modelling | done | `v0.4-modelling` |
 | 5. Decision policy and money | not started | |
 | 6. Explainability and governance | not started | |
 | 7. Streaming | not started | |
@@ -94,3 +94,21 @@ Done:
 Fixed on the way: the first feature build ran for minutes on one core because rows with
 no device key shared one window partition, and the sliding count over `gmail.com`
 (228,355 rows) was quadratic. See DECISIONS.md.
+
+### Phase 4 — Modelling (2026-09-24)
+
+Done:
+- Rules baseline (points, 432-combination grid on round thresholds), logistic
+  regression (8 settings) and LightGBM (8 settings, early stopping), all tuned on April
+  only, in that order. Weighting, not oversampling. Calibration chosen by a time split
+  inside April (none for logistic regression, Platt for LightGBM).
+- MLflow: local sqlite store under `data/mlflow`, experiment `fraud-models`, registered
+  models `fraud-logreg` and `fraud-lightgbm`.
+- Bundles (`data/models/<name>/`) carry preprocessing, model and calibration; a test
+  checks that a saved and reloaded bundle scores identically, one row or many.
+- `reports/model.md` (generated): test PR-AUC 0.561 for LightGBM against 0.113 for
+  logistic regression and 0.047 for the rules; recall 47.6% at a 1% false-positive rate;
+  ECE 0.004. Every read of the test month is logged (3 so far).
+
+Kept failure: logistic regression collapses on May because one legitimate pseudo-card
+with 1,393 transactions fills its alert list (see DECISIONS.md).

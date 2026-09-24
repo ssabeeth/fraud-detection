@@ -16,6 +16,7 @@ must not either. No feature uses a label.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cache
 from typing import Literal
 
 HOUR = 3_600
@@ -209,6 +210,7 @@ LOCAL_NAMES = [f.name for f in LOCAL_FEATURES]
 CATEGORICAL = [f.name for f in LOCAL_FEATURES if f.categorical]
 
 
+@cache
 def reviewer_names() -> dict[str, str]:
     """Plain names for every engineered and local feature (used in reason codes)."""
     return {

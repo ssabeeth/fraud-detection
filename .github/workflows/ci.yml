@@ -3,11 +3,15 @@ name: CI
 on:
   push:
     branches: ["**"]
+    tags: ["v*"]
   pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  FRAUD_SPARK_DRIVER_MEMORY: 2g
 
 jobs:
   lint:
@@ -34,7 +38,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
-      - name: Cache the Delta Lake jars
+      - name: Cache the Delta Lake and Kafka jars
         uses: actions/cache@v6.1.0
         with:
           path: ~/.ivy2.5.2
@@ -43,12 +47,12 @@ jobs:
       - run: uv run --no-sync pytest -m "not kafka" --cov=fraud --cov-report=term
 
   spark-jobs:
-    # The lakehouse jobs end to end on the synthetic fixtures, as `make lakehouse` runs
-    # them on the real data.
+    # The lakehouse and feature jobs end to end on the synthetic fixtures, as
+    # `make data` and `make features` run them on the real data.
     runs-on: ubuntu-latest
     env:
       FRAUD_DATA_DIR: /tmp/fraud-data
-      FRAUD_SPARK_DRIVER_MEMORY: 2g
+      FRAUD_REPORTS_DIR: /tmp/fraud-reports
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6.0.1
@@ -67,8 +71,8 @@ jobs:
       - run: uv run --no-sync fraud silver
       - run: uv run --no-sync fraud gold
       - run: uv run --no-sync fraud features
-      - run: uv run --no-sync fraud check-pit --sample 0 --report /tmp/fraud-data/pit.json
-      - run: uv run --no-sync fraud check-parity --report /tmp/fraud-data/parity.json
+      - run: uv run --no-sync fraud check-pit --sample 0
+      - run: uv run --no-sync fraud check-parity
 
   compose:
     runs-on: ubuntu-latest

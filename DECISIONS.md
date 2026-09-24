@@ -169,3 +169,77 @@ naive pandas implementation that shares no code with Spark: 76,415 values, **0
 differences** (`reports/pit_check.json`). `fraud check-parity` replayed all 590,540
 transactions through the online feature code and compared 24 values per row with the
 Spark table: 14.2 million values, **0 mismatches** (`reports/parity_check.json`).
+
+## 2026-09-24 — Imbalance: weighting, tuned; no oversampling
+
+**Options:** (a) no correction; (b) class weights (`class_weight`, `scale_pos_weight`);
+(c) random oversampling of fraud; (d) SMOTE.
+
+**Decision:** (b), with the weight treated as a hyperparameter and chosen on validation
+alongside the others, so "no weighting" wins if it is better. Oversampling was not used:
+duplicated rows give the same loss as a weight while making every epoch slower, and SMOTE
+invents transactions by interpolating between frauds, whose history features (counts,
+time since the last transaction, new-device flags) would then describe card histories
+that never existed. Weighting inflates scores, so every model is recalibrated on the
+validation month (next entry) before its probabilities meet the cost model.
+
+## 2026-09-24 — Tuning protocol and the test month
+
+All hyperparameters, the rules' thresholds, the calibration method and (in phase 5) the
+policy are chosen on the validation month. LightGBM early-stops on validation PR-AUC.
+The models are trained on months 1-4 only and are **not** refitted on months 1-5 before
+the test month, so the test result measures exactly the model that was tuned. Every read
+of the test month goes through `load_frame(..., test_purpose=...)`, which appends the
+purpose to `reports/test_touches.jsonl`; the reports print the count.
+
+## 2026-09-24 — Calibration chosen by a time split inside validation
+
+The policy multiplies probabilities by amounts, so they must be calibrated. Fitting a
+calibrator and measuring it on the same month would flatter it, so the method (none,
+Platt on the log-odds, isotonic) is chosen by a two-fold time split inside April (fit on
+the first half, Brier score on the second, and the reverse), then refitted on all of
+April. Test calibration is reported in `reports/model.md`.
+
+## 2026-09-24 — Label delay and the offline split
+
+With a 30-day chargeback delay, April's labels would not all be known until the end of
+May, so a policy tuned on April could not really be frozen on 1 May. The offline split
+ignores this, as backtests usually do: it measures how good the choice is, not when it
+could have been made. Phase 7 and 8 honour the delay where it binds in operation:
+monitoring and any retraining trigger see a label only 30 days after its transaction.
+No feature uses a label, so the delay cannot leak into features.
+
+## 2026-09-24 — Rules baseline: points on round thresholds, tuned like the models
+
+**Decision:** five rules a fraud team would write first (large amount, burst in the last
+hour, many in 24 hours, high 24-hour spend, new device with a large amount), with fixed
+points and ties broken by amount. The thresholds come from a grid of round values
+(432 combinations) and are chosen on validation PR-AUC, the same criterion as the
+models, and in phase 5 its decline and review levels are tuned for money on the same
+month as every other policy. The baseline is simple on purpose, but it gets the same
+tuning budget in money as the model, so the comparison is fair.
+
+## 2026-09-24 — Finding: one busy pseudo-card breaks the linear baseline in May
+
+**What happened.** On the test month logistic regression's PR-AUC fell 43% (0.196 to
+0.113) while LightGBM's fell 12% (0.637 to 0.561). One pseudo-card key has 1,393
+transactions in May, none fraud (a business account, or several cards sharing card1,
+addr1 and first-seen day), so 1.5% of May's transactions have more than 100 card
+transactions in the previous 30 days, against 0.01% in April. Logistic regression
+extends its (log) velocity terms linearly and 809 of its top 893 test scores come from
+that key; LightGBM's trees stop at the largest split they learnt, and none of its top
+1% do (89% of them are fraud). The all-history counts also creep up month by month
+because the data starts on 1 December (a card's history is censored at the start).
+
+**Decision:** keep the features and the models as tuned, and report the failure
+(`reports/model.md`, generated). Capping the velocity features or dropping the key after
+seeing the test month would be tuning on the test month. The monitoring phase monitors
+`card_txn_24h` and `card_txn_prior`, where this shift should show up before it costs
+money; a production system would also cap or winsorise velocity inputs to a linear
+model, and treat very high-volume keys (merchants' own cards, corporate accounts) as a
+separate population.
+
+**Consequence:** the test month was read three times in phase 4 (the metrics, then the
+diagnostic, then the metrics and diagnostic together in one final run; the models did
+not change between reads). `fraud evaluate --report-only` now re-renders the report from
+saved metrics, so wording fixes no longer need a test read.

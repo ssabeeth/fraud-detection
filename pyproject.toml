@@ -20,6 +20,29 @@ spark = [
     "delta-spark>=4.1",
     "pyspark>=4.0.1",
 ]
+# Models, evaluation and experiment tracking.
+ml = [
+    "lightgbm>=4.5",
+    "mlflow>=3.0",
+    "scikit-learn>=1.5",
+]
+# Streaming: Kafka API client for Redpanda.
+stream = [
+    "confluent-kafka>=2.5",
+]
+# Scoring API.
+serve = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "lightgbm>=4.5",
+    "prometheus-client>=0.20",
+    "scikit-learn>=1.5",
+    "uvicorn[standard]>=0.30",
+]
+# Drift and performance monitoring.
+monitor = [
+    "evidently>=0.7",
+]
 # Download from Kaggle (needs the owner's token in ~/.kaggle/kaggle.json).
 kaggle = [
     "kaggle>=1.6",
@@ -42,6 +65,10 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fraud"]
+
+[tool.hatch.build.targets.wheel.force-include]
+# The wheel runs on Databricks without the repository, so it carries the configs.
+"configs" = "fraud/_configs"
 
 [tool.uv]
 default-groups = ["dev"]
