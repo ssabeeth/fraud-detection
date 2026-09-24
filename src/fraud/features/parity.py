@@ -111,5 +111,7 @@ def check(spark: SparkSession, s: Settings, splits: set[str], report: Path | Non
     }
     log.info("parity: %s", {k: v for k, v in result.items() if k != "examples"})
     if report is not None:
-        report.write_text(json.dumps(result, indent=2, default=str) + "\n")
+        # Examples name transactions, so they go to the log only, never to the report.
+        public = {k: v for k, v in result.items() if k != "examples"}
+        report.write_text(json.dumps(public, indent=2, default=str) + "\n")
     return result

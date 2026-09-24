@@ -4,7 +4,6 @@
   "values_compared": 14172960,
   "mismatches": 0,
   "mismatches_by_feature": {},
-  "examples": [],
   "splits": [
     "test",
     "train",
