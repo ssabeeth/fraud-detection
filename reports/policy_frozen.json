@@ -3,7 +3,7 @@
   "policy": {
     "type": "ExpectedLossPolicy",
     "score": "score_lightgbm",
-    "review_threshold": 21.087669946167694,
+    "review_threshold": 23.18612891453367,
     "name": "Expected loss"
   },
   "rules_baseline": {
@@ -25,7 +25,7 @@
   "models": {
     "rules": "rules",
     "logreg": "logreg",
-    "lightgbm": 3175
+    "lightgbm": 1559
   },
   "chosen_on": "validation month (April 2018)"
 }

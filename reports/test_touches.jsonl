@@ -2,3 +2,6 @@
 {"at": "2026-09-24T01:33:40+00:00", "purpose": "phase 4 diagnostic: which rows fill each model's top alerts (reports/model.md note)"}
 {"at": "2026-09-24T01:34:35+00:00", "purpose": "phase 4: frozen model metrics and the top-alert diagnostic, reports/model.md"}
 {"at": "2026-09-24T01:40:13+00:00", "purpose": "phase 5: frozen policy, rules baseline and sensitivity table on test"}
+{"at": "2026-09-24T04:03:41+00:00", "purpose": "phase 6: explainable-only model vs all features, and segment checks"}
+{"at": "2026-09-24T04:22:02+00:00", "purpose": "phase 4: frozen model metrics and the top-alert diagnostic, reports/model.md (re-run for the depth-limited LightGBM, see DECISIONS.md)"}
+{"at": "2026-09-24T04:22:28+00:00", "purpose": "phase 5: frozen policy, rules baseline and sensitivity table on test (re-run for the depth-limited LightGBM, see DECISIONS.md)"}
