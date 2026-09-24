@@ -130,3 +130,12 @@ against $474,219 for the rules baseline (16.1% caught).
 
 Fixed on the way: the ranking comparison measured the saving against the wrong
 alternative (see DECISIONS.md); fixed on validation only, no extra test read.
+
+### Fix — depth-limited LightGBM (2026-09-24)
+
+Building phase 7 showed the phase 4 LightGBM needed 162 ms per decision for its SHAP
+reasons (trees up to depth 57). Trees are now capped at depth 8 and LightGBM re-tuned on
+April: 5.4 ms per decision with reasons (p99 5.7 ms). Test PR-AUC 0.547 (was 0.561); the
+policy costs $278,535 on May against $474,219 for the rules (was $270,554). Phases 4 and
+5 reports regenerated; the test month was read twice more for that, logged. Details in
+DECISIONS.md.

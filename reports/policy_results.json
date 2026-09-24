@@ -46,34 +46,34 @@
       "approved_fraud": 2381
     },
     "lightgbm_cutoffs": {
-      "total_cost": 238996.22569999998,
-      "missed_fraud_cost": 210422.98169999997,
-      "declined_legit_cost": 16477.244,
-      "review_cost": 9996.0,
-      "review_delay_cost": 2100.0,
+      "total_cost": 252176.37105,
+      "missed_fraud_cost": 211774.0918,
+      "declined_legit_cost": 27696.27925,
+      "review_cost": 10360.0,
+      "review_delay_cost": 2346.0,
       "fraud_value": 450144.878,
-      "fraud_value_caught": 262137.8963,
-      "fraud_value_caught_share": 0.582341173056733,
-      "declines": 1716,
-      "declined_legit": 349,
-      "reviews": 1428,
-      "reviewed_fraud": 378,
-      "approved_fraud": 1083
+      "fraud_value_caught": 261104.78619999997,
+      "fraud_value_caught_share": 0.5800461117320543,
+      "declines": 1931,
+      "declined_legit": 516,
+      "reviews": 1480,
+      "reviewed_fraud": 307,
+      "approved_fraud": 1106
     },
     "lightgbm_expected_loss": {
-      "total_cost": 204621.41349999997,
-      "missed_fraud_cost": 174932.15749999997,
-      "declined_legit_cost": 19141.256,
-      "review_cost": 8554.0,
-      "review_delay_cost": 1994.0,
+      "total_cost": 217194.348,
+      "missed_fraud_cost": 185093.34,
+      "declined_legit_cost": 20590.008,
+      "review_cost": 9317.0,
+      "review_delay_cost": 2194.0,
       "fraud_value": 450144.878,
-      "fraud_value_caught": 297862.7205,
-      "fraud_value_caught_share": 0.6617041202899124,
-      "declines": 2090,
-      "declined_legit": 597,
-      "reviews": 1222,
-      "reviewed_fraud": 225,
-      "approved_fraud": 1110
+      "fraud_value_caught": 288919.53799999994,
+      "fraud_value_caught_share": 0.6418367777140406,
+      "declines": 2014,
+      "declined_legit": 590,
+      "reviews": 1331,
+      "reviewed_fraud": 234,
+      "approved_fraud": 1170
     }
   },
   "test": {
@@ -123,34 +123,34 @@
       "approved_fraud": 2610
     },
     "lightgbm_cutoffs": {
-      "total_cost": 329311.42925,
-      "missed_fraud_cost": 285043.4375,
-      "declined_legit_cost": 30935.99175,
+      "total_cost": 337318.65945000004,
+      "missed_fraud_cost": 279396.3542,
+      "declined_legit_cost": 44442.305250000005,
       "review_cost": 10850.0,
-      "review_delay_cost": 2482.0,
+      "review_delay_cost": 2630.0,
       "fraud_value": 477355.934,
-      "fraud_value_caught": 221410.4965,
-      "fraud_value_caught_share": 0.46382684435216426,
-      "declines": 2033,
-      "declined_legit": 652,
+      "fraud_value_caught": 226429.5798,
+      "fraud_value_caught_share": 0.47434118583723317,
+      "declines": 2354,
+      "declined_legit": 875,
       "reviews": 1550,
-      "reviewed_fraud": 309,
-      "approved_fraud": 1424
+      "reviewed_fraud": 235,
+      "approved_fraud": 1400
     },
     "lightgbm_expected_loss": {
-      "total_cost": 270554.07529999997,
-      "missed_fraud_cost": 216306.02229999998,
-      "declined_legit_cost": 41752.053,
-      "review_cost": 10080.0,
-      "review_delay_cost": 2416.0,
+      "total_cost": 278534.77835,
+      "missed_fraud_cost": 220030.5721,
+      "declined_legit_cost": 45617.20625,
+      "review_cost": 10367.0,
+      "review_delay_cost": 2520.0,
       "fraud_value": 477355.934,
-      "fraud_value_caught": 288333.91169999994,
-      "fraud_value_caught_share": 0.6040228918574624,
-      "declines": 2668,
-      "declined_legit": 1127,
-      "reviews": 1440,
-      "reviewed_fraud": 232,
-      "approved_fraud": 1341
+      "fraud_value_caught": 285307.3619,
+      "fraud_value_caught_share": 0.597682654763018,
+      "declines": 2608,
+      "declined_legit": 1092,
+      "reviews": 1481,
+      "reviewed_fraud": 221,
+      "approved_fraud": 1377
     }
   },
   "chosen": "lightgbm_expected_loss",
@@ -159,7 +159,7 @@
     "policy": {
       "type": "ExpectedLossPolicy",
       "score": "score_lightgbm",
-      "review_threshold": 21.087669946167694,
+      "review_threshold": 23.18612891453367,
       "name": "Expected loss"
     },
     "rules_baseline": {
@@ -181,40 +181,40 @@
     "models": {
       "rules": "rules",
       "logreg": "logreg",
-      "lightgbm": 3175
+      "lightgbm": 1559
     },
     "chosen_on": "validation month (April 2018)"
   },
   "rankings_valid": {
     "expected saving": {
-      "total_cost": 287561.8133,
-      "missed_fraud_cost": 275781.8133,
+      "total_cost": 294035.0988,
+      "missed_fraud_cost": 282107.0988,
       "declined_legit_cost": 0.0,
       "review_cost": 10500.0,
-      "review_delay_cost": 1280.0,
+      "review_delay_cost": 1428.0,
       "fraud_value": 450144.878,
-      "fraud_value_caught": 215443.0647,
-      "fraud_value_caught_share": 0.47860827753326113,
+      "fraud_value_caught": 210449.7792,
+      "fraud_value_caught_share": 0.4675156588141829,
       "declines": 0,
       "declined_legit": 0,
       "reviews": 1500,
-      "reviewed_fraud": 860,
-      "approved_fraud": 1968
+      "reviewed_fraud": 786,
+      "approved_fraud": 2042
     },
     "probability": {
-      "total_cost": 348853.787,
-      "missed_fraud_cost": 337739.787,
+      "total_cost": 347190.3083,
+      "missed_fraud_cost": 336010.3083,
       "declined_legit_cost": 0.0,
       "review_cost": 10500.0,
-      "review_delay_cost": 614.0,
+      "review_delay_cost": 680.0,
       "fraud_value": 450144.878,
-      "fraud_value_caught": 147491.09100000001,
-      "fraud_value_caught_share": 0.3276524919161693,
+      "fraud_value_caught": 149814.5697,
+      "fraud_value_caught_share": 0.33281411612551987,
       "declines": 0,
       "declined_legit": 0,
       "reviews": 1500,
-      "reviewed_fraud": 1193,
-      "approved_fraud": 1635
+      "reviewed_fraud": 1160,
+      "approved_fraud": 1668
     }
   },
   "sensitivity": [
@@ -222,112 +222,112 @@
       "parameter": "chargeback_fee",
       "value": 10.0,
       "rules_test_cost": 444093.5057,
-      "policy_test_cost": 256254.80304999996,
-      "policy_test_caught_share": 0.5997974054722864,
+      "policy_test_cost": 262649.6561,
+      "policy_test_caught_share": 0.5877740296405324,
       "approve_all_test_cost": 508495.934
     },
     {
       "parameter": "chargeback_fee",
       "value": 50.0,
       "rules_test_cost": 564425.5057000001,
-      "policy_test_cost": 312502.33485,
-      "policy_test_caught_share": 0.6126935669348984,
+      "policy_test_cost": 320273.4902499999,
+      "policy_test_caught_share": 0.5989424287747515,
       "approve_all_test_cost": 633055.934
     },
     {
       "parameter": "review_cost",
       "value": 3.0,
       "rules_test_cost": 468018.5057,
-      "policy_test_cost": 264639.20029999997,
-      "policy_test_caught_share": 0.6039453815609213,
+      "policy_test_cost": 273212.8506,
+      "policy_test_caught_share": 0.5922113705200112,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_cost",
       "value": 15.0,
       "rules_test_cost": 486618.5057,
-      "policy_test_cost": 279001.27819999994,
-      "policy_test_caught_share": 0.6095291051729127,
+      "policy_test_cost": 290506.3256,
+      "policy_test_caught_share": 0.5923274264775349,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_catch_rate",
       "value": 0.8,
       "rules_test_cost": 483010.6644,
-      "policy_test_cost": 287264.86925,
-      "policy_test_caught_share": 0.5821244258377649,
+      "policy_test_cost": 295725.82369999995,
+      "policy_test_caught_share": 0.5691347241113378,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_catch_rate",
       "value": 1.0,
       "rules_test_cost": 465426.347,
-      "policy_test_cost": 250956.327,
-      "policy_test_caught_share": 0.6355884935956405,
+      "policy_test_cost": 263342.86925,
+      "policy_test_caught_share": 0.6217798184949346,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "decline_margin",
       "value": 0.1,
       "rules_test_cost": 474218.5057,
-      "policy_test_cost": 245987.80709999998,
-      "policy_test_caught_share": 0.6680008465129923,
+      "policy_test_cost": 255578.12539999996,
+      "policy_test_caught_share": 0.6548045069447067,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "decline_margin",
       "value": 0.5,
       "rules_test_cost": 474218.5057,
-      "policy_test_cost": 290105.5749,
-      "policy_test_caught_share": 0.5645390146129408,
+      "policy_test_cost": 288409.1858,
+      "policy_test_caught_share": 0.56079758652377,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "decline_fixed",
       "value": 0.0,
       "rules_test_cost": 474218.5057,
-      "policy_test_cost": 254353.51309999998,
-      "policy_test_caught_share": 0.6247164446058818,
+      "policy_test_cost": 266601.18385,
+      "policy_test_caught_share": 0.6111950750359794,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "decline_fixed",
       "value": 25.0,
       "rules_test_cost": 474218.5057,
-      "policy_test_cost": 279006.07645,
-      "policy_test_caught_share": 0.589024734528596,
+      "policy_test_cost": 288877.42015,
+      "policy_test_caught_share": 0.568709245583611,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_delay_friction",
       "value": 0.0,
       "rules_test_cost": 471356.5057,
-      "policy_test_cost": 265217.7304,
-      "policy_test_caught_share": 0.6095590624835513,
+      "policy_test_cost": 277066.5731,
+      "policy_test_caught_share": 0.59441559576381,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_delay_friction",
       "value": 5.0,
       "rules_test_cost": 478511.5057,
-      "policy_test_cost": 272091.0553,
-      "policy_test_caught_share": 0.6058876408562671,
+      "policy_test_cost": 280489.4506,
+      "policy_test_caught_share": 0.5926374676636993,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_capacity_per_day",
       "value": 25,
       "rules_test_cost": 494698.01070000004,
-      "policy_test_cost": 290769.3725,
-      "policy_test_caught_share": 0.5671678986607088,
+      "policy_test_cost": 303109.09424999997,
+      "policy_test_caught_share": 0.5516364964680632,
       "approve_all_test_cost": 539635.934
     },
     {
       "parameter": "review_capacity_per_day",
       "value": 100,
       "rules_test_cost": 438454.8064,
-      "policy_test_cost": 247181.39665,
-      "policy_test_caught_share": 0.6542154959364137,
+      "policy_test_cost": 246544.31915,
+      "policy_test_caught_share": 0.645197298626228,
       "approve_all_test_cost": 539635.934
     }
   ],
@@ -335,7 +335,7 @@
     "approve_all": "no parameters",
     "rules": "never declines; reviews at \u2265 3.00 (points plus the amount tie-break)",
     "logreg_expected_loss": "decline when its expected cost is lowest; review when the expected saving exceeds $41.41",
-    "lightgbm_cutoffs": "decline at P \u2265 0.419, review at P \u2265 0.141",
-    "lightgbm_expected_loss": "decline when its expected cost is lowest; review when the expected saving exceeds $21.09"
+    "lightgbm_cutoffs": "decline at P \u2265 0.315, review at P \u2265 0.127",
+    "lightgbm_expected_loss": "decline when its expected cost is lowest; review when the expected saving exceeds $23.19"
   }
 }

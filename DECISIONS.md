@@ -309,3 +309,35 @@ and re-rendered the report without reading the test month again.
 a quarter of the amount plus $10, its points are not sharp enough for a decline to pay.
 Logistic regression's policy declines 2,544 transactions on May, 2,187 of them
 legitimate: the busy pseudo-card again (phase 4 finding).
+
+## 2026-09-24 — Failure: the first LightGBM was too slow to explain, so trees are capped at depth 8
+
+**What happened.** Building the streaming path (phase 7) showed that the LightGBM chosen
+in phase 4 (255 leaves, no depth limit, 3,175 trees) scores a transaction in 0.96 ms
+but needs 162 ms to compute its exact TreeSHAP reasons. LightGBM grows trees leaf-wise,
+and these reached a mean depth of 32 (maximum 57); TreeSHAP's cost is proportional to
+trees × leaves × depth². Every decision must carry its reasons, so a 162 ms explanation
+breaks the "milliseconds" requirement.
+
+**Options:** (a) keep the model and explain only declines and reviews; (b) explain
+asynchronously after the decision; (c) an approximate attribution (Saabas paths);
+(d) constrain the trees and re-tune. (a) and (b) break "every decision is explained";
+(c) is not SHAP and would need a compiled implementation to be fast. **Decision:** (d),
+`max_depth = 8` as a fixed design constraint, the grid otherwise unchanged, re-tuned on
+April only.
+
+**What it cost.** The first model's results are kept here: validation PR-AUC 0.637, test
+PR-AUC 0.561 (ROC-AUC 0.903); its frozen policy cost $270,554 on May and caught 60.4% of
+fraud value, against $474,219 for the rules. The depth-limited model's results replace
+them in the reports, and the test month was read again to report the
+new model (logged in `reports/test_touches.jsonl` with its purpose). The v0.4 and v0.5
+tags point at the first model's reports.
+
+**The depth-limited model:** 63 leaves, no class weight, platt calibration,
+validation PR-AUC 0.616, test PR-AUC 0.547 (ROC-AUC
+0.902). One decision takes 0.21 ms to score and
+5.4 ms (p99 5.7 ms) with its reasons. Its frozen policy cost
+$278,535 on May and caught
+59.8% of fraud value, against
+$474,219 for the rules: explaining every decision in milliseconds
+cost $7,981 over the month relative to the first model.

@@ -43,6 +43,10 @@ LGBM_BASE = {
     "bagging_fraction": 0.8,
     "bagging_freq": 1,
     "lambda_l2": 1.0,
+    # Every decision carries exact TreeSHAP reasons, whose cost grows with trees × leaves ×
+    # depth². Unconstrained leaf-wise trees reached depth 57 and 162 ms per decision; a
+    # depth limit keeps the reasons within the streaming budget (DECISIONS.md).
+    "max_depth": 8,
     "cat_smooth": 10.0,
     "min_data_per_group": 50,
     "max_cat_threshold": 32,

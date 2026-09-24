@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -30,6 +31,8 @@ def test_log_path() -> Path:
 def record_test_touch(purpose: str, log_path: Path | None = None) -> None:
     log_path = log_path or test_log_path()
     log_path.parent.mkdir(parents=True, exist_ok=True)
+    if note := os.environ.get("FRAUD_TEST_PURPOSE_NOTE"):
+        purpose = f"{purpose} ({note})"
     entry = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose}
     with log_path.open("a") as f:
         f.write(json.dumps(entry) + "\n")
