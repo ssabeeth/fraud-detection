@@ -122,3 +122,50 @@ without an identity record are not pooled into one giant "device".
 
 PySpark 4.2 warns that it does not yet support pandas 3, so `pandas<3` is pinned until it
 does.
+
+## 2026-09-24 — Point-in-time features: strictly before, same second invisible
+
+**Decision:** every aggregate for a transaction at `t` uses transactions of the same
+entity with `t_e < t`; a window of `W` keeps `t - W <= t_e < t`. In Spark this is a
+*range* frame `rangeBetween(-W, -1)` on the integer `TransactionDT` (a row frame would
+let same-second rows see each other depending on their order). The online state holds
+same-second events as *pending* and folds them in only when a later timestamp arrives.
+No feature uses a label, so label delay cannot leak into features.
+
+**Options considered for ties:** (a) order ties by `TransactionID` and let the later see
+the earlier; (b) make them invisible to each other. (a) depends on an ordering the
+stream does not guarantee, so the two implementations could disagree; (b) is what a
+scorer can promise. 1.1% of fixture rows are same-second ties by construction; the
+tests cover them.
+
+## 2026-09-24 — Feature set: 17 history aggregates plus readable transaction fields
+
+The aggregates (velocity by card over 1 h / 24 h / 7 d / 30 d / all history, spend over
+24 h / 7 d, time since the previous transaction, amount z-score and ratio against the
+card's history, distinct devices and email domains, new-device and new-email flags,
+device velocity and cards per device, email-domain volume) are the ones a fraud
+analyst reasons with. Windows are fixed, round and few, so each reason code reads
+naturally. Features are defined once in `features/definitions.py`; `docs/features.md` is
+generated from it and a test fails when it is stale.
+
+## 2026-09-24 — Spark performance: private partitions for missing keys, counts by difference
+
+Two changes made the feature job linear, with the results unchanged (the point-in-time
+and parity tests pass before and after):
+
+- rows with no device (76%) or no email domain were one window partition each; they now
+  get a partition per row, since their features are null anyway;
+- windowed counts are `count(before t) − count(before t − W)`. Spark recomputes a
+  sliding frame's aggregate for every row, which is quadratic on a hot key
+  (`gmail.com` has 228,355 rows); running counts are incremental and integers subtract
+  exactly. Sums keep the sliding frame, whose partitions (cards) are small, so floating
+  point matches the online path's order of addition.
+
+## 2026-09-24 — Point-in-time and parity checks on the real data
+
+`fraud check-pit` recomputed 17 aggregates for 4,495 sampled rows (a random 3,000 plus
+fraud rows and rows of the busiest cards; 899 are fraud) from silver history with a
+naive pandas implementation that shares no code with Spark: 76,415 values, **0
+differences** (`reports/pit_check.json`). `fraud check-parity` replayed all 590,540
+transactions through the online feature code and compared 24 values per row with the
+Spark table: 14.2 million values, **0 mismatches** (`reports/parity_check.json`).

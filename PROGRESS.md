@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 2 (data and lakehouse) done; phase 3 (features) next.**
+**Status: phase 3 (features) done; phase 4 (modelling) next.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -20,7 +20,7 @@ the owner can do".
 |---|---|---|
 | 1. Scaffold | done | `v0.1-scaffold` |
 | 2. Data and lakehouse | done | `v0.2-lakehouse` |
-| 3. Features | not started | |
+| 3. Features | done | `v0.3-features` |
 | 4. Modelling | not started | |
 | 5. Decision policy and money | not started | |
 | 6. Explainability and governance | not started | |
@@ -75,3 +75,22 @@ by hour offset h of the day boundary were 152,471 at h=0 and rose monotonically 
 had their minimum (28,742) at h=0. The anchor's midnight is the boundary D1 used.
 
 Tools installed: `openjdk@17` (Homebrew). Spark 4.2.0 with Delta 4.4.0 locally.
+
+### Phase 3 — Features (2026-09-24)
+
+Done:
+- One definition of every feature (`features/definitions.py`): 17 point-in-time history
+  aggregates over the card, device and email keys, and 19 readable transaction fields.
+- Three implementations: Spark window functions (`offline.py`), per-key streaming state
+  (`online.py`), and a naive pandas recomputation from raw history (`reference.py`).
+- Tests: the point-in-time test on every fixture row, a canary (a window that includes
+  the current row) that the test must catch, online/offline parity on every fixture row,
+  and unit tests for ties, window edges, new-value flags and out-of-order events.
+- Real data: `gold/features` (590,540 rows, 225 MB). Point-in-time check: 76,415 values,
+  0 differences. Parity: 14.2 million values, 0 mismatches; the online code computes
+  about 112,000 events per second in one process.
+- `docs/features.md`, generated from the definitions.
+
+Fixed on the way: the first feature build ran for minutes on one core because rows with
+no device key shared one window partition, and the sliding count over `gmail.com`
+(228,355 rows) was quadratic. See DECISIONS.md.
