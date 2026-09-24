@@ -6,11 +6,23 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Sabeeth" }]
 dependencies = [
+    "matplotlib>=3.9",
     "numpy>=2.0",
-    "pandas>=2.2",
+    "pandas>=2.2,<3",  # PySpark 4.2 does not yet support pandas 3
     "pyarrow>=17",
     "pydantic>=2.8",
     "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# Lakehouse jobs (bronze, silver, gold, features). Needs Java 17.
+spark = [
+    "delta-spark>=4.1",
+    "pyspark>=4.0.1",
+]
+# Download from Kaggle (needs the owner's token in ~/.kaggle/kaggle.json).
+kaggle = [
+    "kaggle>=1.6",
 ]
 
 [project.scripts]
