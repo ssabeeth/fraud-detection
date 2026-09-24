@@ -1,0 +1,28 @@
+# Project configuration. Every value here is a decision; the reason for each is in
+# DECISIONS.md. Paths are relative to the repository root unless absolute, and
+# FRAUD_DATA_DIR in the environment overrides data_dir.
+
+data_dir: data
+
+# TransactionDT is seconds from an undisclosed reference point. We treat
+# TransactionDT = 0 as this instant (UTC), so the first transaction falls on
+# 2017-12-01. See DECISIONS.md, "Time anchor".
+anchor: "2017-11-30T00:00:00"
+
+# Time-based split on event time. Intervals are [start, end). No row is ever
+# shuffled across these boundaries.
+split:
+  train: ["2017-12-01", "2018-04-01"]   # months 1-4
+  valid: ["2018-04-01", "2018-05-01"]   # month 5: all tuning, thresholds and the policy
+  test: ["2018-05-01", "2018-06-02"]    # month 6: touched once per reported result
+
+# Chargebacks arrive late. A label becomes visible this many days after its
+# transaction, in the stream simulation and in monitoring.
+label_delay_days: 30
+
+kafka:
+  bootstrap_servers: "localhost:19092"
+  topics:
+    transactions: "transactions"
+    decisions: "decisions"
+    labels: "labels"
