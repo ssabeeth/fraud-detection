@@ -1,0 +1,44 @@
+# Local streaming stack. `make up` starts the broker; `make down` stops it.
+# Redpanda speaks the Kafka API, so the producer, stream processor and the Spark
+# Structured Streaming sink use ordinary Kafka clients against localhost:19092.
+name: fraud
+
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.3
+    container_name: fraud-redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+      - --mode=dev-container
+      - --smp=1
+      - --memory=1G
+      - --default-log-level=warn
+    ports:
+      - "19092:19092"   # Kafka API for clients on the host
+      - "19644:9644"    # admin API
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -E 'Healthy:.+true' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - redpanda:/var/lib/redpanda/data
+
+  # Optional web UI for browsing topics: `docker compose --profile console up -d`.
+  console:
+    image: docker.redpanda.com/redpandadata/console:v3.12.0
+    container_name: fraud-console
+    profiles: ["console"]
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+    ports:
+      - "8080:8080"
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+volumes:
+  redpanda:
