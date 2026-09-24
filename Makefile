@@ -68,6 +68,14 @@ explain: ## Explainable-only model, segment checks, SHAP; then the model and dat
 stream: up ## Replay the test month through Redpanda, the processor and the Spark sink
 	$(UV) run fraud stream
 
+.PHONY: monitor
+monitor: ## Drift and delayed-label performance on the replay; reports/monitoring.md
+	$(UV) run fraud monitor
+
+.PHONY: serve
+serve: ## Run the scoring API on localhost:8000
+	$(UV) run uvicorn fraud.serve.app:app --port 8000
+
 .PHONY: fixtures
 fixtures: ## Regenerate the synthetic CI fixtures
 	$(UV) run python scripts/make_fixtures.py
@@ -79,3 +87,7 @@ up: ## Start Redpanda (Kafka API on localhost:19092)
 .PHONY: down
 down: ## Stop Redpanda and remove its volume
 	docker compose down -v
+
+.PHONY: image
+image: ## Build the scoring API image with the local LightGBM bundle
+	scripts/build_image.sh data/models/lightgbm fraud-api:local
