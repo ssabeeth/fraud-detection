@@ -91,12 +91,37 @@ def evaluate(spark, s: Settings, out_dir: Path | None = None) -> dict:
                     {f"{name}_{split}_pr_auc": m["pr_auc"], f"{name}_{split}_roc_auc": m["roc_auc"]}
                 )
     diagnostic = busiest_key_diagnostic(bundles, scored, valid, test)
+    diagnostic["single_event_ms"] = single_event_latency(bundles["lightgbm"], valid)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "model_metrics.json").write_text(
         json.dumps(results | {"diagnostic": diagnostic}, indent=2) + "\n"
     )
     write_model_report(bundles, results, scored, valid, out_dir, diagnostic)
     return results
+
+
+def single_event_latency(bundle: ModelBundle, frame: pd.DataFrame, n: int = 500) -> dict:
+    """Time to score one transaction and compute its SHAP reasons (validation rows)."""
+    import time
+
+    rows = frame.sample(n=min(n, len(frame)), random_state=0).to_dict("records")
+    score_only, with_reasons = [], []
+    for r in rows:
+        t0 = time.perf_counter()
+        bundle.model.predict(bundle.preprocessor.transform_one(r))
+        t1 = time.perf_counter()
+        bundle.score_one(r)
+        t2 = time.perf_counter()
+        score_only.append((t1 - t0) * 1e3)
+        with_reasons.append((t2 - t1) * 1e3)
+    q = lambda v, p: float(np.percentile(v, p))  # noqa: E731
+    return {
+        "rows": len(rows),
+        "score_p50": q(score_only, 50),
+        "score_p99": q(score_only, 99),
+        "score_and_reasons_p50": q(with_reasons, 50),
+        "score_and_reasons_p99": q(with_reasons, 99),
+    }
 
 
 def busiest_key_diagnostic(bundles, scored, valid: pd.DataFrame, test: pd.DataFrame) -> dict:

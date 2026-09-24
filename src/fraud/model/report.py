@@ -149,6 +149,23 @@ def _diagnostic_lines(d: dict, results: dict) -> list[str]:
         "The monitoring phase is where a shift like this should be caught before it costs "
         "money (reports/monitoring.md).",
         "",
+        *_latency_lines(d.get("single_event_ms")),
+    ]
+
+
+def _latency_lines(t: dict | None) -> list[str]:
+    if not t:
+        return []
+    return [
+        "### Cost of one decision",
+        "",
+        f"One transaction at a time (median / 99th percentile over {t['rows']} validation "
+        f"rows, on the development laptop): score {t['score_p50']:.2f} / {t['score_p99']:.2f} "
+        "ms; score with exact TreeSHAP reasons "
+        f"{t['score_and_reasons_p50']:.1f} / "
+        f"{t['score_and_reasons_p99']:.1f} ms. TreeSHAP costs trees × leaves × depth², which "
+        "is why the trees are limited to depth 8 (DECISIONS.md).",
+        "",
     ]
 
 
