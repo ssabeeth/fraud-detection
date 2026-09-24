@@ -1,24 +1,17 @@
 # Progress
 
 **Status (2026-09-24): phases 1-8, 11 and 12 done; phases 9 and 10 written and checked
-without credentials, waiting for the owner's accounts. Nothing has been pushed: the
-GitHub repository does not exist yet.** Every result is from the real data and is in
-`reports/`; the headline is in the README.
+without credentials, waiting for the owner's accounts. Pushed to
+<https://github.com/ssabeeth/fraud-detection>; the first CI run passed every job.**
+Every result is from the real data and is in `reports/`; the headline is in the README.
 
 ## Stopped for the owner: exact situation and next steps
 
-1. **Create the GitHub repository and push.** Creating a public repository was blocked
-   by this session's permission settings, so all work is committed locally on `main`
-   with tags `v0.1-scaffold` to `v0.12-readme`. From this folder:
-
-   ```bash
-   gh repo create ssabeeth/fraud-detection --public --source . --remote origin
-   git push origin main --tags
-   ```
-
-   Then check the CI run (the `image` job publishes `ghcr.io/ssabeeth/fraud-api` with a
-   model trained on synthetic data) and make that package public in GitHub (Packages →
-   fraud-api → settings), which the Azure step needs.
+1. ~~**Create the GitHub repository and push.**~~ Done 2026-09-24: `main` and tags
+   `v0.1-scaffold` to `v0.12-readme` pushed; CI passed (lint, test, spark-jobs, stream,
+   terraform, image, compose). `ghcr.io/ssabeeth/fraud-api:latest` is already pullable
+   without credentials (the package took the public repository's visibility), so the
+   Azure step needs no change in the package settings.
 2. **Expire the Kaggle API token** that was pasted into the chat (kaggle.com → Settings
    → API). The download used `kaggle auth login` instead; the pasted token was never
    stored or used.

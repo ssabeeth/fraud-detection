@@ -23,8 +23,9 @@ registry; the Container App then needs a registry credential.
 - An Azure account (a card is needed to verify identity; nothing here is billed while idle).
 - `brew install azure-cli terraform`
 - `az login`, then note the subscription id: `az account show --query id -o tsv`.
-- In GitHub, make the `fraud-api` package public (Packages → fraud-api → Package settings →
-  Change visibility), so Azure can pull it without a secret.
+- The `fraud-api` package must be public, so Azure can pull it without a secret. It took
+  the public repository's visibility when CI first published it; if it ever shows as
+  private, change it in GitHub (Packages → fraud-api → Package settings → Change visibility).
 
 ## Apply: budget first
 
