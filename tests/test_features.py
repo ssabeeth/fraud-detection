@@ -6,7 +6,7 @@ import pytest
 
 from fraud.features.catalogue import render
 from fraud.features.definitions import AGGREGATE_NAMES, AGGREGATES, DAY, HOUR, LOCAL_NAMES
-from fraud.features.offline import add_features, build_features
+from fraud.features.offline import add_features
 from fraud.features.online import OnlineFeatures
 from fraud.features.pit import check
 from fraud.features.reference import _close
@@ -97,9 +97,8 @@ def test_every_aggregate_has_a_reviewer_name_and_unique_name():
 
 
 @pytest.fixture(scope="module")
-def features(spark, lake):
-    build_features(spark, lake)
-    return spark.read.format("delta").load(table_path(lake, GOLD_FEATURES))
+def features(spark, feature_lake):
+    return spark.read.format("delta").load(table_path(feature_lake, GOLD_FEATURES))
 
 
 @pytest.mark.spark
