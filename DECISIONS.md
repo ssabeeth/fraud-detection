@@ -573,3 +573,14 @@ of actual and 100% of forecast spend is applied first, on its own
 `terraform fmt -check`, `init -backend=false`, `validate` and `tflint` (azurerm ruleset)
 with no credentials; all pass locally. The provider lock file covers linux_amd64,
 darwin_arm64 and darwin_amd64 so CI verifies the same provider build.
+
+## 2026-09-24 — Dashboard: one daily CSV, built by the owner in Tableau Public
+
+**Decision:** `fraud policy` writes `exports/daily_policy_results.csv`, one row per day
+of the test month and policy (155 rows, 16 KB): transactions, fraud, fraud value and
+value caught, declines and false declines, reviews and reviews that were fraud, false
+alarms, and the three costs and their total. Nothing is row-level, so it can be published
+with the workbook. A test checks that its monthly totals equal the policy report to the
+dollar. `docs/tableau.md` is the build guide (connection, calculated fields, five sheets,
+layout, the check before publishing); the owner builds and publishes, as the brief says,
+since Tableau Public needs the owner's account and publishing is public.

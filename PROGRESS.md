@@ -28,7 +28,7 @@ the owner can do".
 | 8. Serving and monitoring | done | `v0.8` |
 | 9. Databricks | ready; needs the owner's workspace login to deploy | `v0.9-databricks-ready` |
 | 10. Cloud slice with Terraform | ready; needs the owner's Azure login to apply | `v0.10-azure-ready` |
-| 11. Business dashboard | not started | |
+| 11. Business dashboard | export and guide done; the owner builds and publishes | `v0.11-dashboard` |
 | 12. README | not started | |
 
 ## Log
@@ -218,3 +218,10 @@ validate, tflint; no credentials), `make tf-check`. Terraform 1.16.4 installed v
 Homebrew; tflint runs from its official Docker image locally (no Homebrew formula).
 Blocked on: the owner's Azure account and `az login` (Azure CLI not installed), and the
 GitHub repository existing so CI can publish the image.
+
+### Phase 11 — Business dashboard (2026-09-24)
+
+Done: `exports/daily_policy_results.csv` (daily aggregates for every policy on the test
+month; a test ties its totals to `reports/policy.md`) and `docs/tableau.md` (step-by-step
+build guide). Owner's step: build and publish in Tableau Public, then add the link to the
+README.
