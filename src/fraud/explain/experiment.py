@@ -30,7 +30,7 @@ from fraud.model.metrics import summarise
 from fraud.model.pipeline import models_dir
 from fraud.policy import policy as P
 from fraud.policy.costs import APPROVE, CostModel
-from fraud.stream.scorer import FrozenPolicy
+from fraud.policy.frozen import FrozenPolicy
 
 log = logging.getLogger(__name__)
 
