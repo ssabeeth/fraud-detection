@@ -88,6 +88,22 @@ up: ## Start Redpanda (Kafka API on localhost:19092)
 down: ## Stop Redpanda and remove its volume
 	docker compose down -v
 
+.PHONY: databricks-deploy
+databricks-deploy: ## Validate and deploy the Databricks Asset Bundle (needs databricks auth login)
+	databricks bundle validate -t free
+	databricks bundle deploy -t free
+
+.PHONY: databricks-upload
+databricks-upload: ## Download the CSVs from Kaggle, upload them to the raw volume, delete local copies
+	$(UV) run fraud download
+	databricks fs cp data/raw/train_transaction.csv dbfs:/Volumes/workspace/fraud/raw/ --overwrite
+	databricks fs cp data/raw/train_identity.csv dbfs:/Volumes/workspace/fraud/raw/ --overwrite
+	rm -f data/raw/train_transaction.csv data/raw/train_identity.csv
+
+.PHONY: databricks-run
+databricks-run: ## Run phases 2-5 as a Databricks Job and wait for it
+	databricks bundle run fraud_pipeline -t free
+
 .PHONY: image
 image: ## Build the scoring API image with the local LightGBM bundle
 	scripts/build_image.sh data/models/lightgbm fraud-api:local
