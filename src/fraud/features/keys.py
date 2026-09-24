@@ -13,9 +13,10 @@ must produce identical strings; ``tests/test_keys.py`` checks that on every fixt
 from __future__ import annotations
 
 import math
+from typing import TYPE_CHECKING
 
-from pyspark.sql import Column
-from pyspark.sql import functions as F
+if TYPE_CHECKING:
+    from pyspark.sql import Column
 
 SECONDS_PER_DAY = 86_400
 NA = "NA"
@@ -56,10 +57,12 @@ def email_key(row: dict) -> str | None:
     return None if _missing(v) else str(v)
 
 
-# --- offline (Spark) -------------------------------------------------------------------
+# --- offline (Spark; imported lazily so the scoring image needs no Spark) ----------------
 
 
 def card_key_col() -> Column:
+    from pyspark.sql import functions as F
+
     first_seen = F.floor(F.col("TransactionDT") / SECONDS_PER_DAY) - F.col("D1")
     return F.concat_ws(
         "_",
@@ -70,9 +73,13 @@ def card_key_col() -> Column:
 
 
 def device_key_col() -> Column:
+    from pyspark.sql import functions as F
+
     parts = [F.coalesce(F.col(p).cast("string"), F.lit("")) for p in DEVICE_PARTS]
     return F.when(F.col("DeviceInfo").isNotNull(), F.concat_ws("|", *parts))
 
 
 def email_key_col() -> Column:
+    from pyspark.sql import functions as F
+
     return F.col("P_emaildomain")

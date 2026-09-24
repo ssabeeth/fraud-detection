@@ -16,7 +16,27 @@ import yaml
 from pydantic import BaseModel, field_validator, model_validator
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_CONFIG = REPO_ROOT / "configs" / "base.yaml"
+
+
+def config_dir() -> Path:
+    """``configs/`` in a checkout; the copy packaged in the wheel otherwise (Databricks)."""
+    if env := os.environ.get("FRAUD_CONFIG_DIR"):
+        return Path(env)
+    repo = REPO_ROOT / "configs"
+    return repo if repo.exists() else Path(__file__).parent / "_configs"
+
+
+def reports_dir() -> Path:
+    """Where generated reports go: ``reports/`` in a checkout, or ``FRAUD_REPORTS_DIR``."""
+    return Path(os.environ.get("FRAUD_REPORTS_DIR") or REPO_ROOT / "reports")
+
+
+def exports_dir() -> Path:
+    """Aggregated exports for the dashboard: ``exports/``, or ``FRAUD_EXPORTS_DIR``."""
+    return Path(os.environ.get("FRAUD_EXPORTS_DIR") or REPO_ROOT / "exports")
+
+
+DEFAULT_CONFIG = config_dir() / "base.yaml"
 
 SECONDS_PER_DAY = 86_400
 
@@ -113,7 +133,7 @@ class Settings(BaseModel):
 
 
 def load_settings(config_path: Path | str | None = None) -> Settings:
-    path = Path(config_path or os.environ.get("FRAUD_CONFIG") or DEFAULT_CONFIG)
+    path = Path(config_path or os.environ.get("FRAUD_CONFIG") or config_dir() / "base.yaml")
     raw = yaml.safe_load(path.read_text())
     data_dir = Path(os.environ.get("FRAUD_DATA_DIR") or raw.get("data_dir", "data"))
     if not data_dir.is_absolute():
