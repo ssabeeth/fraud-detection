@@ -405,3 +405,64 @@ here, which is recorded as a limitation.
 Segment checks show the burden tracking the fraud rate: credit cards are alerted at
 10.2% (fraud rate 6.4%) and debit at 2.8% (2.6%); product W, 78% of volume, has the
 lowest precision (21%) and recall (32%).
+
+## 2026-09-24 — Streaming: one partition, in-memory state warmed from the lake
+
+**Decision:** each topic has one partition, and the processor keeps per-key state in
+memory, warmed at start-up with every earlier transaction from the lake. One partition
+preserves a single event-time order, which the point-in-time rule relies on for card,
+device and email state at once.
+
+**What scaling out would change:** partitioning by card key keeps card state local, but
+device and email features aggregate across cards, so they would need their own keyed
+stages (repartition by device key, by email domain) whose outputs are joined back, or a
+shared low-latency state store. Warm-up from the lake would become a snapshot of that
+store. Both are what a feature store provides; see "What production would add".
+
+## 2026-09-24 — Latency is measured per event, including SHAP
+
+The processor scores one event at a time (no micro-batching) and computes TreeSHAP for
+every decision, since every decision must carry reasons. The single-event path builds the
+model input as a NumPy row from the fitted category levels (no pandas), and one
+`pred_contrib` call gives both the probability and the reasons. A test checks that
+single-event scores equal the batch scores to 1e-10.
+
+## 2026-09-24 — Labels on their own topic, 30 days late, and the clock runs on
+
+Each label is published at `TransactionDT + 30 days` on the simulated clock. Labels of
+April transactions fall due during the May replay and are published then; after the last
+May transaction the clock runs on for 30 more days so May's own labels arrive, as they
+would in June. The monitor reads labels only from this topic.
+
+## 2026-09-24 — Stream sink: Spark Structured Streaming to Delta bronze, raw JSON
+
+Each topic lands in its own bronze table with the raw message value and Kafka metadata
+(topic, partition, offset, timestamp), with checkpoints so a re-run only appends new
+messages. Parsing happens downstream (the parity test and the monitor read the JSON),
+as with the batch bronze tables.
+
+## 2026-09-24 — Two replays: as fast as possible, and paced
+
+The test month is replayed twice. As fast as possible, the decisions per second are the
+processor's capacity and every feature is compared with the offline table. Paced at
+3,600× real time (a month in about 12 minutes), the processor keeps up with arrivals, so
+end-to-end latency (producer send to decision published) is what a transaction would
+see; replayed flat out, end-to-end latency is mostly time spent queued behind the
+backlog the producer builds, which says nothing about the system.
+
+## 2026-09-24 — Stream landing zone reset per replay
+
+Each replay recreates its topics, so Kafka offsets start again at zero. The Spark sink's
+checkpoint from the previous replay would then skip every new message below the old
+offsets. `fraud stream` therefore empties the stream bronze tables and their checkpoints
+before each replay; a test replays twice and checks the second lands the same rows.
+
+## 2026-09-24 — Result: the stream agrees with the offline system
+
+On the real test month through Redpanda (`reports/stream.md`): 89,326 transactions ×
+20 values read back from Delta bronze, 0 mismatches with the offline feature table;
+every action equal to the frozen policy applied offline to the same rows; the largest
+difference in P(fraud) between the online (NumPy row) and offline (pandas batch) paths
+1.2e-14; no decision without reasons. One process makes 183 decisions a second (5.4 ms
+each at the median, with SHAP); paced at 1,800× real time the end-to-end latency is
+15.5 ms at the median and 56 ms at the 99th percentile.

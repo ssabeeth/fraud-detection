@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 6 (explainability and governance) done; phase 7 (streaming) next.**
+**Status: phase 7 (streaming) done; phase 8 (serving and monitoring) next.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -24,7 +24,7 @@ the owner can do".
 | 4. Modelling | done | `v0.4-modelling` |
 | 5. Decision policy and money | done | `v0.5-policy` |
 | 6. Explainability and governance | done | `v0.6-explainability` |
-| 7. Streaming | not started | |
+| 7. Streaming | done | `v0.7-streaming` |
 | 8. Serving and monitoring | not started | |
 | 9. Databricks | not started | |
 | 10. Cloud slice with Terraform | not started | |
@@ -153,3 +153,25 @@ Done:
   (`fraud cards`).
 - Found and fixed on the way: reason values that were Python integers were shown as
   strings.
+
+### Phase 7 — Streaming (2026-09-24)
+
+Done:
+- Replay producer (event time × speed-up, labels 30 days late on their own topic),
+  stream processor (per-key state warmed from the lake, features → score → TreeSHAP
+  reasons → frozen policy with the daily review capacity), Spark Structured Streaming
+  sink from Kafka to Delta bronze.
+- The parity test through the stream on the real test month: 89,326 transactions ×
+  20 values read back from Delta bronze, **0 mismatches**; every action equal to the
+  frozen policy applied offline; largest score difference 1.2e-14.
+- Latency and throughput (`reports/stream.md`): 5.4 ms per decision at the median as
+  fast as possible (183 decisions a second, one process); paced at 1,800× real time,
+  15.5 ms end to end at the median and 56 ms at p99.
+- Tests: the scorer against offline features, scores and policy; message encoding; the
+  label timeline; the whole stream on the fixtures with Redpanda (CI job `stream`),
+  including a second replay that must land the same rows.
+
+Fixed on the way: the first LightGBM needed 162 ms per decision for its SHAP reasons,
+so trees are now capped at depth 8 (see the fix entry above); the sink checkpoint would
+have skipped a second replay's messages; the producer held a month of 430-field dicts in
+memory at once.
