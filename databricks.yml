@@ -1,0 +1,39 @@
+# Databricks Asset Bundle: phases 2-5 as a Job on Databricks Free Edition (serverless).
+#
+#   databricks auth login --host https://<workspace>.cloud.databricks.com
+#   make databricks-upload     # CSVs from Kaggle to the Unity Catalog volume
+#   databricks bundle deploy -t free
+#   databricks bundle run fraud_pipeline -t free
+#
+# Free Edition blocks most outbound internet, so the data is never downloaded inside the
+# workspace: the owner uploads the two CSVs to the raw volume. See docs/databricks.md.
+bundle:
+  name: fraud-detection
+
+variables:
+  catalog:
+    description: Unity Catalog catalog (Free Edition gives you `workspace`)
+    default: workspace
+  schema:
+    description: Schema that holds the volumes
+    default: fraud
+  data_dir:
+    description: Where the lake, models and reports live
+    default: /Volumes/${var.catalog}/${var.schema}/lake
+  raw_dir:
+    description: Where the owner uploads the Kaggle CSVs
+    default: /Volumes/${var.catalog}/${var.schema}/raw
+
+artifacts:
+  fraud_wheel:
+    type: whl
+    build: uv build --wheel
+    path: .
+
+include:
+  - databricks/*.yml
+
+targets:
+  free:
+    mode: development
+    default: true
