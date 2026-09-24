@@ -1,0 +1,109 @@
+resources:
+  schemas:
+    fraud_schema:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}
+      comment: IEEE-CIS fraud detection (non-commercial, education)
+
+  volumes:
+    raw:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.fraud_schema.name}
+      name: raw
+      comment: The two Kaggle CSVs, uploaded by the owner; deleted after bronze
+    lake:
+      catalog_name: ${var.catalog}
+      schema_name: ${resources.schemas.fraud_schema.name}
+      name: lake
+      comment: Delta bronze, silver, gold, models and reports
+
+  jobs:
+    fraud_pipeline:
+      name: fraud-pipeline
+      description: >
+        Phases 2-5 of the fraud project: bronze, silver, gold, point-in-time features and
+        the point-in-time check, the three models, evaluation and the money policy.
+      max_concurrent_runs: 1
+      environments:
+        - environment_key: fraud
+          spec:
+            client: "3"
+            # Serverless compute provides Spark, Delta and MLflow; the job adds the wheel
+            # and the modelling libraries it uses.
+            dependencies:
+              - ../dist/*.whl
+              - lightgbm>=4.5
+              - scikit-learn>=1.5
+              - matplotlib>=3.9
+      tasks:
+        - task_key: bronze
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "bronze", "--raw-dir", "${var.raw_dir}"]
+        - task_key: silver
+          depends_on: [{task_key: bronze}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "silver"]
+        - task_key: gold
+          depends_on: [{task_key: silver}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "gold"]
+        - task_key: profile
+          depends_on: [{task_key: gold}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "profile"]
+        - task_key: features
+          depends_on: [{task_key: gold}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "features"]
+        - task_key: check_pit
+          depends_on: [{task_key: features}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "check-pit", "--sample", "3000"]
+        - task_key: train
+          depends_on: [{task_key: check_pit}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "train"]
+        - task_key: evaluate
+          depends_on: [{task_key: train}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "evaluate"]
+        - task_key: policy
+          depends_on: [{task_key: evaluate}]
+          environment_key: fraud
+          python_wheel_task:
+            package_name: fraud
+            entry_point: fraud
+            parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
+                         "policy"]

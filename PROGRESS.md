@@ -26,7 +26,7 @@ the owner can do".
 | 6. Explainability and governance | done | `v0.6-explainability` |
 | 7. Streaming | done | `v0.7-streaming` |
 | 8. Serving and monitoring | done | `v0.8` |
-| 9. Databricks | not started | |
+| 9. Databricks | ready; needs the owner's workspace login to deploy | `v0.9-databricks-ready` |
 | 10. Cloud slice with Terraform | not started | |
 | 11. Business dashboard | not started | |
 | 12. README | not started | |
@@ -199,3 +199,12 @@ pseudo-card), scores stayed stable (PSI at most 0.011), no retrain triggered, an
 June cohorts confirmed performance held. The feed-health check caught the stress
 scenario's silent identity feed on its first full day. Fixed on the way: the first
 version only noticed the silent feed after ten days (see DECISIONS.md).
+
+### Phase 9 — Databricks (2026-09-24): ready, not deployed
+
+Done: Asset Bundle with schema, volumes and a job running phases 2-5 from the wheel on
+serverless; `make databricks-deploy`, `make databricks-upload`, `make databricks-run`;
+`docs/databricks.md`; a test that every task is a valid CLI command in pipeline order.
+The wheel was built and run outside the repository (packaged configs, `--data-dir`).
+Blocked on: the owner's Free Edition workspace and `databricks auth login` (none on this
+machine). The Databricks CLI (v1.17.0) is installed.
