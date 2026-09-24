@@ -1,6 +1,6 @@
 # Progress
 
-**Status: phase 5 (decision policy and money) done; phase 6 (explainability) next.**
+**Status: phase 6 (explainability and governance) done; phase 7 (streaming) next.**
 
 The GitHub remote does not exist yet: creating the public repository was blocked by
 the session's permission settings, so all work is committed locally. See "What only
@@ -23,7 +23,7 @@ the owner can do".
 | 3. Features | done | `v0.3-features` |
 | 4. Modelling | done | `v0.4-modelling` |
 | 5. Decision policy and money | done | `v0.5-policy` |
-| 6. Explainability and governance | not started | |
+| 6. Explainability and governance | done | `v0.6-explainability` |
 | 7. Streaming | not started | |
 | 8. Serving and monitoring | not started | |
 | 9. Databricks | not started | |
@@ -139,3 +139,17 @@ April: 5.4 ms per decision with reasons (p99 5.7 ms). Test PR-AUC 0.547 (was 0.5
 policy costs $278,535 on May against $474,219 for the rules (was $270,554). Phases 4 and
 5 reports regenerated; the test month was read twice more for that, logged. Details in
 DECISIONS.md.
+
+### Phase 6 — Explainability and governance (2026-09-24)
+
+Done:
+- Reason codes: top three positive TreeSHAP contributions per decision, with plain
+  names (reviewer names for engineered and readable fields, Vesta's family for masked
+  columns).
+- The explainable-only experiment: $92,513 (33%) more on May than all features.
+- Segment checks by product, card network, card type, device type and email domain,
+  with the statement that this is not a fairness audit and what one would need.
+- `docs/model_card.md` and `docs/data_card.md`, generated from the report JSON
+  (`fraud cards`).
+- Found and fixed on the way: reason values that were Python integers were shown as
+  strings.

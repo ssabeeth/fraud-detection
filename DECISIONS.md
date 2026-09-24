@@ -341,3 +341,67 @@ $278,535 on May and caught
 59.8% of fraud value, against
 $474,219 for the rules: explaining every decision in milliseconds
 cost $7,981 over the month relative to the first model.
+
+## 2026-09-24 — Reason codes from LightGBM's own TreeSHAP
+
+**Options:** (a) the `shap` package's `TreeExplainer`; (b) LightGBM's `pred_contrib`,
+which implements the same TreeSHAP algorithm inside the booster.
+
+**Decision:** (b). It gives exact SHAP values for the tree ensemble, needs no extra
+dependency in the scoring image (the `shap` package pulls in numba and llvmlite), and one
+call returns both the probability (the contributions plus the bias sum to the raw
+log-odds; a test checks this) and the reasons. The reasons are the three features with
+the largest positive contributions, i.e. the ones that pushed this transaction towards
+fraud. SHAP values are in log-odds before calibration; calibration is monotone, so it
+does not change which features pushed the score up.
+
+## 2026-09-24 — Naming masked features by the family Vesta published
+
+A reviewer cannot be told what `V258` measures, because Vesta did not say. Reasons name
+masked columns by family ("V258 — Vesta risk signal (masked)", "C13 — count of linked
+entities (masked)"), which is honest about what is known. How often a masked column is
+the top reason, and what it costs to drop them, are both reported, since that is the
+governance question: a model whose reasons cannot be explained to a customer or a
+regulator carries model risk that the money must justify.
+
+## 2026-09-24 — The explainable-only experiment uses the same protocol
+
+The explainable model gets the same LightGBM grid, early stopping, calibration choice and
+expected-loss policy tuned on validation as the main model; only the feature set
+differs (36 features against 452). The difference in money on the test month is the
+price of explainability under this cost model.
+
+## 2026-09-24 — Segment checks, and why they are not a fairness audit
+
+Alert rate, precision, recall and fraud value caught are reported by product, card
+network, card type, device type and email domain (top eight, the rest pooled). The data
+has no protected characteristics, so fairness in the legal sense cannot be assessed; the
+report says so and lists what an audit would need (the characteristics or a lawful proxy,
+a stated criterion such as equal false-decline rates, and outcomes for declined
+customers).
+
+## 2026-09-24 — Model and data cards generated from the reports
+
+`docs/model_card.md` and `docs/data_card.md` are written by `fraud cards` from the report
+JSON files, so every number in them comes from a run and they cannot drift from the
+results.
+
+## 2026-09-24 — Result: explainability costs $92,513 a month; Vesta's columns carry the history
+
+Generated in `reports/explainability.md`. On May 2018 the explainable-only LightGBM
+(36 features, same protocol) costs $371,047 against $278,535 for the all-features model:
+$92,513 (33%) more, and it catches 46.9% of fraud value against 59.8%. 63% of the
+all-features model's alerts have a masked column as their top reason (C13 alone 18%).
+
+This project's own point-in-time aggregates account for only 5.7% of the all-features
+model's mean |SHAP|, while in the explainable model the time since the card's last
+transaction, the history length and 7-day spend are among its top 20 features. The
+likely reading is that Vesta's masked C (linked-entity counts) and D (time deltas)
+columns already encode the entity history, computed on Vesta's side with its real card
+identifiers; the aggregates matter when those columns are removed. It also means the
+all-features model leans on columns whose point-in-time correctness cannot be checked
+here, which is recorded as a limitation.
+
+Segment checks show the burden tracking the fraud rate: credit cards are alerted at
+10.2% (fraud rate 6.4%) and debit at 2.8% (2.6%); product W, 78% of volume, has the
+lowest precision (21%) and recall (32%).
