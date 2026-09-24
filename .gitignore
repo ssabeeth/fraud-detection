@@ -16,15 +16,16 @@ data/
 *.csv.zip
 *.zip
 *.parquet
-!tests/fixtures/**
-!reports/**/*.csv
-!exports/**/*.csv
 ieee-fraud-detection*
 train_transaction*
 train_identity*
 test_transaction*
 test_identity*
 sample_submission*
+# Exceptions, after every rule they override: synthetic fixtures and aggregate exports.
+!tests/fixtures/**
+!reports/**/*.csv
+!exports/**/*.csv
 spark-warehouse/
 metastore_db/
 derby.log
