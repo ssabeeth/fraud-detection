@@ -29,6 +29,22 @@ test: ## Unit tests (no broker needed)
 check-data: ## Fail if any tracked file looks like competition rows
 	git ls-files -z | xargs -0 $(UV) run python scripts/check_no_raw_data.py
 
+.PHONY: data
+data: ## Download from Kaggle and build bronze (deletes the CSVs), silver, gold, profile
+	$(UV) run fraud download
+	$(UV) run fraud bronze
+	$(MAKE) lakehouse
+
+.PHONY: lakehouse
+lakehouse: ## Rebuild silver, gold and the data profile from bronze
+	$(UV) run fraud silver
+	$(UV) run fraud gold
+	$(UV) run fraud profile
+
+.PHONY: fixtures
+fixtures: ## Regenerate the synthetic CI fixtures
+	$(UV) run python scripts/make_fixtures.py
+
 .PHONY: up
 up: ## Start Redpanda (Kafka API on localhost:19092)
 	docker compose up -d --wait redpanda
