@@ -1,0 +1,37 @@
+# Monitoring thresholds. Each has a reason in DECISIONS.md ("Monitoring thresholds").
+# Drift is measured daily over a trailing 7-day window against the validation month,
+# the data the policy was chosen on. Performance is measured per weekly cohort of
+# transactions, and only with labels that have arrived (30 days after each transaction).
+
+window_days: 7
+
+input_drift:
+  # Evidently's per-column tests (Wasserstein distance for numbers, Jensen-Shannon for
+  # categories, threshold 0.1 each). Warn when this share of monitored columns drifts.
+  drifted_share_warn: 0.3
+
+score_drift:
+  # Population stability index of P(fraud) against validation, on validation deciles.
+  psi_warn: 0.1
+  psi_alert: 0.2
+
+feed_health:
+  # On the latest day alone: a field present on at least `min_present` of reference rows
+  # that is present on less than `drop` times its usual share raises a feed alert.
+  min_present: 0.05
+  drop: 0.5
+
+alert_rate:
+  # Declines + reviews as a share of transactions; relative change against validation.
+  relative_change_warn: 0.5
+
+performance:
+  # Per weekly cohort, once its labels are complete. Against the validation month.
+  pr_auc_ratio_alert: 0.8        # alert if PR-AUC falls below 80% of validation's
+  value_caught_drop_alert: 0.10  # alert if fraud value caught drops 10 points or more
+
+retrain:
+  # Retrain (on every label that has arrived) when either holds:
+  # - a performance alert on a complete cohort, or
+  # - a score-drift alert on 7 consecutive days together with an input-drift warning.
+  consecutive_score_alert_days: 7
