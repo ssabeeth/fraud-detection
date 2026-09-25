@@ -7,6 +7,31 @@ comparison with XGBoost and CatBoost (never reading May) backs LightGBM:
 `reports/model_comparison.md`.
 Every result is from the real data and is in `reports/`; the headline is in the README.
 
+## In progress (2026-09-25): adopting the card's chargeback history
+
+Branch `phase-4b-experiments` (not merged). Done and committed on it:
+
+- `reports/data_patterns.md` (`fraud patterns`, December to April only) and the
+  pre-registered experiments `reports/experiments.md` (`fraud experiments`, February to
+  April, May never read). Only the card's chargeback history known after the 30-day
+  delay passes the rule: +$49k a month (95% interval +$40k to +$59k); a block list
+  captures about 70% of that and the model adds a further $43k over three months.
+- The three `card_known_*` features built in Spark, online, the naive reference, parity,
+  the stream (labels topic, `_labels_before` barrier) and the API; all 100 tests pass,
+  including the Kafka ones. `docs/features.md` regenerated.
+
+Next, in order (each writes its report; test-month reads are logged):
+
+1. `uv run fraud features`, `uv run fraud check-pit --sample 3000`, `uv run fraud check-parity`.
+2. `FRAUD_TEST_PURPOSE_NOTE="phase 4b: model retrained with the card's chargeback history"`
+   then `uv run fraud train`, `uv run fraud evaluate`, `uv run fraud policy`.
+3. `uv run fraud explain`, `uv run fraud cards`, `make dashboard`.
+4. With Redpanda up (`colima start`, `docker compose up -d`): `uv run fraud stream`
+   (speed-up 0) and `uv run fraud stream --speedup 1800`, then `uv run fraud monitor`.
+5. Rewrite the README headline and results from the new reports (keep the old headline
+   as the result before the change), DECISIONS.md result entry, then CI, merge, tag.
+6. Databricks: redeploy and run the job's tasks from `features` onward; then `v1.0`.
+
 ## Stopped for the owner: exact situation and next steps
 
 1. ~~**Create the GitHub repository and push.**~~ Done 2026-09-24: `main` and tags
