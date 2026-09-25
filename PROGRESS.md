@@ -18,10 +18,9 @@ Every result is from the real data and is in `reports/`; the headline is in the 
 3. **Databricks (phase 9).** Create a Free Edition workspace, then
    `databricks auth login --host https://<workspace>.cloud.databricks.com`, then
    `make databricks-deploy databricks-upload databricks-run` (see `docs/databricks.md`).
-4. **Azure (phase 10).** Create an account, `brew install azure-cli`, `az login`, copy
-   `infra/azure/terraform.tfvars.example` to `terraform.tfvars` and fill it in, then apply
-   the budget first and the rest second, exactly as in `docs/deploy_azure.md`. Destroy
-   with `terraform destroy` when done.
+4. ~~**Azure (phase 10).**~~ Done 2026-09-25: applied budget first, then the API; live at
+   <https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health>.
+   Destroy with `terraform destroy` in `infra/azure` when it is no longer wanted.
 5. **Tableau (phase 11).** Build and publish the dashboard from
    `exports/daily_policy_results.csv` following `docs/tableau.md`; add the link to the
    README.
@@ -230,15 +229,19 @@ The wheel was built and run outside the repository (packaged configs, `--data-di
 Blocked on: the owner's Free Edition workspace and `databricks auth login` (none on this
 machine). The Databricks CLI (v1.17.0) is installed.
 
-### Phase 10 — Cloud slice with Terraform (2026-09-24): ready, not applied
+### Phase 10 — Cloud slice with Terraform (2026-09-24; applied 2026-09-25)
 
 Done: `infra/azure/` (resource group, budget alert, Container Apps environment, a
 scale-to-zero Container App running `ghcr.io/ssabeeth/fraud-api`), `terraform.tfvars.example`,
 `docs/deploy_azure.md` (budget-first apply, test, destroy), CI job `terraform` (fmt,
 validate, tflint; no credentials), `make tf-check`. Terraform 1.16.4 installed via
 Homebrew; tflint runs from its official Docker image locally (no Homebrew formula).
-Blocked on: the owner's Azure account and `az login` (Azure CLI not installed), and the
-GitHub repository existing so CI can publish the image.
+Applied 2026-09-25 with the owner's `az login` (Azure CLI 2.90.0 via Homebrew): the
+resource group and the $5 budget first, then the environment and the API. `/health` and a
+synthetic `/score` answer from the live URL (52 s for the first request from zero, 28 ms
+inside the API after). A new subscription needed the `Microsoft.App` provider registered
+and the `Consumption` workload profile declared; both are now in the configuration, and
+`terraform plan` reports no changes.
 
 ### Phase 11 — Business dashboard (2026-09-24)
 

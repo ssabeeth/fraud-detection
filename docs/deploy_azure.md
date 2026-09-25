@@ -7,6 +7,22 @@ plan bills per vCPU-second and GiB-second actually used, above a monthly free gr
 environment has no fixed fee; no Log Analytics workspace is created; the image comes from
 a public GitHub Container Registry package.
 
+## Deployed
+
+Applied on 2026-09-25 to the owner's subscription (UK South), budget first:
+<https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health>.
+
+- The first request after the deployment took 52 s (image pull and a replica starting
+  from zero); a synthetic `/score` request then took 28 ms inside the API.
+- Worst case, if something called it without pause all month: one replica of 0.25 vCPU
+  and 0.5 GiB costs about $0.03 an hour of activity, and the monthly free grant covers
+  roughly the first 200 hours, so a month of nonstop use would cost about $14. The budget
+  alert emails at $2.50 actual and $5 forecast; `terraform destroy` removes everything.
+- Two things a new subscription needed, both now in the configuration: the Container
+  Apps resource provider (`Microsoft.App`) is not registered by default, so the provider
+  block registers it; and Azure gives every new environment a `Consumption` workload
+  profile, which is declared so that plans stay clean.
+
 ## What the public image contains
 
 CI builds `ghcr.io/ssabeeth/fraud-api` with a model trained on the **synthetic CI
