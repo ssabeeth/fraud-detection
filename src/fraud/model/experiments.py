@@ -61,6 +61,8 @@ class Experiment:
     remove: tuple[str, ...] = ()
     recent_days: int | None = None
     params: dict = field(default_factory=dict)
+    blocklist: bool = False  # decline any card with a known chargeback, whatever the score
+    post_hoc: bool = False  # added after the results were seen; never adopted
 
 
 def experiments(drifting: list[str]) -> list[Experiment]:
@@ -113,6 +115,13 @@ def experiments(drifting: list[str]) -> list[Experiment]:
             recent_days=RECENT_DAYS,
         ),
         Experiment("weight_5x", "Fraud weighted five times", "1", params={"scale_pos_weight": 5.0}),
+        Experiment(
+            "baseline_blocklist",
+            "Current features plus a block list (decline cards with a known chargeback)",
+            "9, post hoc",
+            blocklist=True,
+            post_hoc=True,
+        ),
     ]
 
 
@@ -233,6 +242,8 @@ def run(spark, s: Settings, out_dir: Path | None = None, names: list[str] | None
             raw_i, raw_s, rounds = _fit_predict(xf, yf, xi, yi, xs, e.params)
             cal, _ = calibration.choose(raw_i, yi, f.inner["TransactionDT"].to_numpy())
             p = cal(raw_s)
+            if e.blocklist:
+                p = np.where(f.score["card_known_chargebacks"].to_numpy() > 0, 1.0, p)
             m = summarise(ys, p, amt)
             per_day = daily_costs(f.score, p, costs)
             daily[e.name].append(per_day.tolist())
@@ -262,8 +273,12 @@ def run(spark, s: Settings, out_dir: Path | None = None, names: list[str] | None
                 "pattern": e.pattern,
                 "added": list(e.add),
                 "removed": list(e.remove),
+                "post_hoc": e.post_hoc,
                 "folds": results[e.name],
-                **compare_to_baseline(daily[e.name], daily["baseline"], results, e.name),
+                "daily_costs": daily[e.name],
+                **compare_to_baseline(
+                    daily[e.name], daily["baseline"], results, e.name, adoptable=not e.post_hoc
+                ),
             }
             for e in chosen
         ],
@@ -275,27 +290,43 @@ def run(spark, s: Settings, out_dir: Path | None = None, names: list[str] | None
         "rule": "adopt only if cheaper in every month and the 95% interval of the pooled "
         "saving excludes zero",
     }
-    (out_dir / "experiments.json").write_text(json.dumps(result, indent=2) + "\n")
+    saved = out_dir / "experiments.json"
+    if names is not None and saved.exists():
+        order = [e.name for e in experiments(drifting)]
+        kept = {e["name"]: e for e in json.loads(saved.read_text())["experiments"]}
+        kept.update({e["name"]: e for e in result["experiments"]})
+        result["experiments"] = [kept[n] for n in order if n in kept]
+    saved.write_text(json.dumps(result, indent=2) + "\n")
     from fraud.model.experiments_report import write_report
 
     write_report(result, out_dir)
     return result
 
 
-def compare_to_baseline(exp_days, base_days, results, name, seed: int = 7) -> dict:
+def paired_saving(exp_days, ref_days, seed: int = 7, draws: int | None = None):
+    """Per-month saving of ``exp`` against ``ref`` and a 95% interval for the pooled saving,
+    resampling whole days within each month (the review queue is per day)."""
+    n = draws or BOOTSTRAP
+    saving = [float(np.sum(r) - np.sum(e)) for e, r in zip(exp_days, ref_days, strict=True)]
+    rng = np.random.default_rng(seed)
+    total = np.zeros(n)
+    for e, r in zip(exp_days, ref_days, strict=True):
+        diff = np.asarray(r) - np.asarray(e)
+        idx = rng.integers(0, len(diff), size=(n, len(diff)))
+        total += diff[idx].sum(axis=1)
+    lo, hi = np.percentile(total, [2.5, 97.5])
+    return saving, float(lo), float(hi)
+
+
+def compare_to_baseline(
+    exp_days, base_days, results, name, seed: int = 7, adoptable: bool = True
+) -> dict:
     """Saving against the baseline (positive = cheaper), per month and pooled, with a 95%
     interval from resampling whole days within each month."""
-    saving = [float(np.sum(b) - np.sum(e)) for e, b in zip(exp_days, base_days, strict=True)]
-    rng = np.random.default_rng(seed)
-    draws = np.zeros(BOOTSTRAP)
-    for e, b in zip(exp_days, base_days, strict=True):
-        diff = np.asarray(b) - np.asarray(e)
-        idx = rng.integers(0, len(diff), size=(BOOTSTRAP, len(diff)))
-        draws += diff[idx].sum(axis=1)
-    lo, hi = np.percentile(draws, [2.5, 97.5])
+    saving, lo, hi = paired_saving(exp_days, base_days, seed)
     base_pr = [r["pr_auc"] for r in results["baseline"]]
     pr = [r["pr_auc"] for r in results[name]]
-    adopted = name != "baseline" and all(x > 0 for x in saving) and lo > 0
+    adopted = adoptable and name != "baseline" and all(x > 0 for x in saving) and lo > 0
     return {
         "saving_by_month": saving,
         "pooled_saving": float(sum(saving)),

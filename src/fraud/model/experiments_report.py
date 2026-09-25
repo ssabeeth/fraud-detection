@@ -17,6 +17,8 @@ def _signed(v: float) -> str:
 
 def verdict(e: dict) -> str:
     """Why an experiment was or was not adopted, in the rule's terms."""
+    if e.get("post_hoc"):
+        return "Post hoc, added after the results were seen, so not eligible for adoption."
     months = len(e["saving_by_month"])
     cheaper = sum(x > 0 for x in e["saving_by_month"])
     if e["adopted"]:
@@ -34,10 +36,75 @@ def finding(e: dict) -> str:
     pr = sum(e["pr_auc_change"]) / len(e["pr_auc_change"])
     direction = "saves" if per_month > 0 else "costs"
     return (
-        f"{e['question']} {direction} {_usd(abs(per_month))} a month on average "
+        f"**{e['question']}**: {direction} {_usd(abs(per_month))} a month on average "
         f"(95% interval {_signed(lo)} to {_signed(hi)} saved a month) and changes mean PR-AUC "
         f"by {pr:+.3f}. {verdict(e)}"
     )
+
+
+def what_changes(result: dict) -> list[str]:
+    passed = [e for e in result["experiments"] if e["adopted"]]
+    if not passed:
+        return [
+            "Nothing passed the rule, so the model is unchanged. The ablations still say what "
+            "each part of the feature set is worth."
+        ]
+    best = max(passed, key=lambda e: (e["pooled_saving"], -e["folds"][0]["features"]))
+    out = []
+    if len(passed) > 1:
+        others = [e for e in passed if e is not best]
+        rest = ", ".join(f'{_signed(e["pooled_saving"])} for "{e["question"]}"' for e in others)
+        out.append(
+            f"{len(passed)} changes pass the rule, and they overlap. "
+            f"**{best['question']}** saves the most over the three months "
+            f"({_signed(best['pooled_saving'])}, against "
+            + rest
+            + f") with {best['folds'][0]['features']} features, so it alone is adopted. The "
+            "rule did not say what to do when overlapping changes both pass; this tie-break "
+            "(most money saved, then fewest features) was decided after the results were seen, "
+            "and the other additions each fail the rule on their own."
+        )
+    else:
+        out.append(f"Adopted: **{best['question']}**.")
+    out.append(
+        "It is then built in the Spark and stream feature code with point-in-time and parity "
+        "tests, the model is retrained and tuned on April by the usual pipeline, the policy "
+        "re-frozen, and May scored once more as a new, logged result."
+    )
+    return out
+
+
+def blocklist_check(exps: dict) -> list[str]:
+    """Does the model with the label history do more than the current model plus a block
+    list? Only when both were run."""
+    if not {"label_history", "baseline_blocklist"} <= set(exps):
+        return []
+    from fraud.model.experiments import paired_saving
+
+    lh, bl = exps["label_history"], exps["baseline_blocklist"]
+    saving, lo, hi = paired_saving(lh["daily_costs"], bl["daily_costs"])
+    months = len(saving)
+    return [
+        "## Is it more than a block list?",
+        "",
+        "Vesta's labels mark transactions that follow a reported chargeback on the same card "
+        "as fraud too, so a model that knows about earlier chargebacks is partly learning "
+        "that labelling rule. In production the rule's equivalent is a block list. So the "
+        "post-hoc question is whether the model does better than the current model with a "
+        "block list that declines any card with a known chargeback.",
+        "",
+        f"The block list alone saves {_signed(bl['pooled_saving'])} over the three months "
+        f"({' / '.join(_signed(x) for x in bl['saving_by_month'])}). The model with the label "
+        f"history saves a further {_signed(sum(saving))} on top of it "
+        f"({' / '.join(_signed(x) for x in saving)}; 95% interval {_signed(lo)} to "
+        f"{_signed(hi)}), "
+        + (
+            f"cheaper in all {months} months: it learns more from the history than the rule does."
+            if all(x > 0 for x in saving) and lo > 0
+            else "which does not clearly beat the rule."
+        ),
+        "",
+    ]
 
 
 def write_report(result: dict, out_dir: Path) -> Path:
@@ -75,7 +142,11 @@ def write_report(result: dict, out_dir: Path) -> Path:
             saving = " / ".join(_signed(x) for x in e["saving_by_month"])
             lo, hi = e["saving_interval"]
             pooled = f"{_signed(e['pooled_saving'])} ({_signed(lo)} to {_signed(hi)})"
-            decision = "**adopted**" if e["adopted"] else "not adopted"
+            decision = (
+                "post hoc"
+                if e.get("post_hoc")
+                else ("**passes the rule**" if e["adopted"] else "fails the rule")
+            )
         lines.append(
             f"| {e['question']} | {e['pattern']} | {f[0]['features']} | "
             + " / ".join(f"{r['pr_auc']:.3f}" for r in f)
@@ -92,21 +163,8 @@ def write_report(result: dict, out_dir: Path) -> Path:
     for e in result["experiments"]:
         if e["name"] != "baseline":
             lines.append(f"- {finding(e)}")
-    adopted = [e for e in result["experiments"] if e["adopted"]]
-    lines += ["", "## What changes", ""]
-    if adopted:
-        lines.append(
-            "Adopted: "
-            + ", ".join(e["question"].lower() for e in adopted)
-            + ". Each is then built in the Spark and stream feature code with point-in-time "
-            "and parity tests, the model is retrained and tuned on April, the policy "
-            "re-frozen, and May scored once more as a new, logged result."
-        )
-    else:
-        lines.append(
-            "Nothing passed the rule, so the model is unchanged. The ablations still say "
-            "what each part of the feature set is worth."
-        )
+    lines += ["", "## What changes", "", *what_changes(result), ""]
+    lines += blocklist_check(exps)
     lines.append("")
     path = out_dir / "experiments.md"
     path.write_text("\n".join(lines))
