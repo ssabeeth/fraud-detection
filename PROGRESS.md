@@ -2,8 +2,9 @@
 
 **Status (2026-09-25): all twelve phases done. The Databricks job reproduces the local
 run on the owner's workspace, the scoring API is live on Azure, and the dashboard is on
-GitHub Pages. Pushed to <https://github.com/ssabeeth/fraud-detection>.** Next: a
-rolling-origin comparison of LightGBM with XGBoost and CatBoost, then `v1.0`.
+GitHub Pages. Pushed to <https://github.com/ssabeeth/fraud-detection>.** A three-month
+comparison with XGBoost and CatBoost (never reading May) backs LightGBM:
+`reports/model_comparison.md`.
 Every result is from the real data and is in `reports/`; the headline is in the README.
 
 ## Stopped for the owner: exact situation and next steps
@@ -26,7 +27,7 @@ Every result is from the real data and is in `reports/`; the headline is in the 
    views are a static page, `site/index.html`, published by `.github/workflows/pages.yml`
    to <https://ssabeeth.github.io/fraud-detection/>. GitHub Pages must be switched on once, with "GitHub Actions"
    as the source.
-6. Tag `v1.0` once the model comparison is in.
+6. Tag `v1.0`.
 
 **Local machine state.** Installed with Homebrew: `openjdk@17`, `terraform` 1.16.4,
 the Databricks CLI (v1.17.0); Colima and Docker were already there (Colima is stopped
