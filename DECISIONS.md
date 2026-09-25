@@ -570,10 +570,10 @@ public on GitHub Container Registry). A resource-group budget with e-mail alerts
 of actual and 100% of forecast spend is applied first, on its own
 (`terraform apply -target=...`), before anything that could cost money.
 
-**Status:** not applied. It needs the owner's Azure account and `az login`. CI runs
+**Status:** applied 2026-09-25 with the owner's `az login` (see below). CI runs
 `terraform fmt -check`, `init -backend=false`, `validate` and `tflint` (azurerm ruleset)
-with no credentials; all pass locally. The provider lock file covers linux_amd64,
-darwin_arm64 and darwin_amd64 so CI verifies the same provider build.
+with no credentials. The provider lock file covers linux_amd64, darwin_arm64 and
+darwin_amd64 so CI verifies the same provider build.
 
 ## 2026-09-24 — Dashboard: one daily CSV, built by the owner in Tableau Public
 
@@ -585,3 +585,49 @@ with the workbook. A test checks that its monthly totals equal the policy report
 dollar. `docs/tableau.md` is the build guide (connection, calculated fields, five sheets,
 layout, the check before publishing); the owner builds and publishes, as the brief says,
 since Tableau Public needs the owner's account and publishing is public.
+
+## 2026-09-25 — Azure: what a new subscription needed
+
+The first full apply stopped at the Container Apps environment: a new subscription does
+not have the `Microsoft.App` resource provider registered, and the azurerm provider's
+default "core" registrations leave it out. **Decision:** the provider block lists it in
+`resource_providers_to_register`, so `apply` registers it (free), rather than a manual
+`az provider register` that the next person would have to know about. The second plan
+then wanted to remove a `Consumption` workload profile that Azure adds to every new
+environment, and Azure put it back after each apply. **Decision:** declare that profile
+(pay per use, no fixed fee) on the environment and the app; the plan now reports no
+changes. The live API answered `/health` and a synthetic `/score` (52 s for the first
+request from zero, 28 ms inside the API after).
+
+## 2026-09-25 — Databricks: what the first real run changed
+
+Four problems appeared only on the workspace, each fixed in code with a test where one
+fits:
+
+1. **Development mode renamed the schema** to `dev_<user>_fraud`, while the job's volume
+   paths and `make databricks-upload` use `/Volumes/workspace/fraud`. **Decision:** no
+   `mode` on the target (the job has no schedule to pause and runs as the deploying user
+   either way); a test ties the paths to the schema. The empty misnamed schema and
+   volumes were replaced with the owner's approval.
+2. **Serverless environment 3 ships pandas 1.5 and numpy 1.26**, and serverless refuses a
+   wheel that upgrades core packages. Loosening the wheel's minimums would run the code
+   on versions it was never tested with. **Decision:** environment version 6 (pandas
+   2.3.3, numpy 2.3.4, scikit-learn 1.7.2, lightgbm 4.6.0), which meets every minimum.
+   The wheel's version carries a build stamp so a redeploy is never served a cached
+   install.
+3. **Unity Catalog model names** have three levels and no hyphens, and registration
+   needs a signature. **Decision:** `registered_name()` gives `fraud-<model>` locally and
+   `<catalog>.<schema>.fraud_<model>` in Unity Catalog; both models log a signature
+   everywhere, and the test registers LightGBM and checks both signatures. skops joins
+   the job's libraries for the logistic regression's format.
+4. **The point-in-time check ran for 57 minutes** before it was cancelled (25 s on the
+   laptop). It split the whole history into one frame per key (217,850 card keys) to
+   recompute 4,495 rows. **Decision:** group only the keys the sample needs, each with
+   its full history, so the check is as independent as before and gives the same
+   result; each stage now logs its time. It then took 13.2 minutes on serverless.
+
+The job's evaluate and policy tasks read the test month again. That is a reproduction of
+the reported run, not a new result, so `--test-note` labels those reads in the workspace's
+test-read log. The run was repaired from `check_pit` onward rather than restarted,
+because bronze deletes the uploaded CSVs once they are converted.
+
