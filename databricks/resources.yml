@@ -27,7 +27,10 @@ resources:
       environments:
         - environment_key: fraud
           spec:
-            client: "3"
+            # Version 6 ships pandas 2.3, numpy 2.3, scikit-learn 1.7, lightgbm 4.6 and
+            # matplotlib 3.10, which meet the wheel's minimums. Version 3 ships pandas 1.5
+            # and numpy 1.26, and serverless refuses a wheel that upgrades those.
+            environment_version: "6"
             # Serverless compute provides Spark, Delta and MLflow; the job adds the wheel
             # and the modelling libraries it uses.
             dependencies:
@@ -35,6 +38,7 @@ resources:
               - lightgbm>=4.5
               - scikit-learn>=1.5
               - matplotlib>=3.9
+              - skops>=0.13  # MLflow saves the logistic regression in skops format
       tasks:
         - task_key: bronze
           environment_key: fraud
