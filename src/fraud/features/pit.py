@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -73,14 +74,20 @@ def check(
     report: Path | None = None,
 ) -> list[tuple]:
     """Return the differences (empty when the features are point-in-time correct)."""
+    t0 = time.perf_counter()
     raw = raw_history(spark, s)
     rows = raw if sample is None else sample_rows(raw, sample)
+    log.info("history: %d rows, %d sampled (%.1fs)", len(raw), len(rows), time.perf_counter() - t0)
+    t0 = time.perf_counter()
     expected = recompute(raw, rows)
+    log.info("recomputed from history (%.1fs)", time.perf_counter() - t0)
+    t0 = time.perf_counter()
     if features is None:
         features = spark.read.format("delta").load(table_path(s, GOLD_FEATURES))
     ids = spark.createDataFrame(rows[["TransactionID"]])
     actual = features.join(ids, "TransactionID").select("TransactionID", *AGGREGATE_NAMES)
     actual = actual.toPandas()
+    log.info("feature table rows fetched (%.1fs)", time.perf_counter() - t0)
     diffs = differences(expected, actual)
     log.info(
         "point-in-time check: %d rows x %d features, %d differences",

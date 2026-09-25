@@ -342,7 +342,7 @@ def _queue_chart(daily: pd.DataFrame, chosen: str, capacity: int) -> str:
     parts = [_axes(ticks, y, days, x, money=False)]
     for i, (reviews, fraud) in enumerate(zip(d["reviews"], d["reviews_fraud"], strict=True)):
         left = x(i) - bw / 2
-        tip = f"{_day(days[i])}: {reviews} reviews, {fraud} were fraud"
+        tip = f"{_day(days[i])}: {reviews} reviews, {fraud} {'was' if fraud == 1 else 'were'} fraud"
         parts.append(
             f"<g><title>{html.escape(tip)}</title>"
             f"<rect class='bar' x='{left:.1f}' y='{y(reviews):.1f}' width='{bw:.1f}' "

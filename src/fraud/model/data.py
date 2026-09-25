@@ -34,8 +34,9 @@ def record_test_touch(purpose: str, log_path: Path | None = None) -> None:
     if note := os.environ.get("FRAUD_TEST_PURPOSE_NOTE"):
         purpose = f"{purpose} ({note})"
     entry = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "purpose": purpose}
-    with log_path.open("a") as f:
-        f.write(json.dumps(entry) + "\n")
+    # Rewritten whole rather than appended to: Databricks volumes do not support appends.
+    before = log_path.read_text() if log_path.exists() else ""
+    log_path.write_text(before + json.dumps(entry) + "\n")
     log.warning("test month read: %s", purpose)
 
 

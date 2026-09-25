@@ -23,17 +23,25 @@ variables:
   raw_dir:
     description: Where the owner uploads the Kaggle CSVs
     default: /Volumes/${var.catalog}/${var.schema}/raw
+  test_note:
+    description: Added to each test-month read the job logs, so the log shows why it happened
+    default: Databricks reproduction of the local run, not a new result
 
 artifacts:
   fraud_wheel:
     type: whl
     build: uv build --wheel
     path: .
+    # Adds a build timestamp to the wheel's version, so serverless compute does not reuse
+    # a cached install of an earlier build with the same version number.
+    dynamic_version: true
 
 include:
   - databricks/*.yml
 
 targets:
   free:
-    mode: development
+    # No `mode: development`: it renames the schema to dev_<user>_fraud, while the job's
+    # paths (data_dir, raw_dir) and `make databricks-upload` use /Volumes/workspace/fraud.
+    # The job has no schedule to pause and runs as the deploying user either way.
     default: true

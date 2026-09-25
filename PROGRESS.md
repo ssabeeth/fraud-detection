@@ -1,8 +1,9 @@
 # Progress
 
-**Status (2026-09-24): phases 1-8, 11 and 12 done; phases 9 and 10 written and checked
-without credentials, waiting for the owner's accounts. Pushed to
-<https://github.com/ssabeeth/fraud-detection>; the first CI run passed every job.**
+**Status (2026-09-25): all twelve phases done. The Databricks job reproduces the local
+run on the owner's workspace, the scoring API is live on Azure, and the dashboard is on
+GitHub Pages. Pushed to <https://github.com/ssabeeth/fraud-detection>.** Next: a
+rolling-origin comparison of LightGBM with XGBoost and CatBoost, then `v1.0`.
 Every result is from the real data and is in `reports/`; the headline is in the README.
 
 ## Stopped for the owner: exact situation and next steps
@@ -15,9 +16,9 @@ Every result is from the real data and is in `reports/`; the headline is in the 
 2. **Expire the Kaggle API token** that was pasted into the chat (kaggle.com → Settings
    → API). The download used `kaggle auth login` instead; the pasted token was never
    stored or used.
-3. **Databricks (phase 9).** Create a Free Edition workspace, then
-   `databricks auth login --host https://<workspace>.cloud.databricks.com`, then
-   `make databricks-deploy databricks-upload databricks-run` (see `docs/databricks.md`).
+3. ~~**Databricks (phase 9).**~~ Done 2026-09-25: deployed to the owner's Free Edition
+   workspace and run end to end; it reproduces the local headline to the dollar
+   (`docs/databricks.md`, "Result").
 4. ~~**Azure (phase 10).**~~ Done 2026-09-25: applied budget first, then the API; live at
    <https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health>.
    Destroy with `terraform destroy` in `infra/azure` when it is no longer wanted.
@@ -25,7 +26,7 @@ Every result is from the real data and is in `reports/`; the headline is in the 
    views are a static page, `site/index.html`, published by `.github/workflows/pages.yml`
    to <https://ssabeeth.github.io/fraud-detection/>. GitHub Pages must be switched on once, with "GitHub Actions"
    as the source.
-6. When 3 is done, update this file and the README and tag `v1.0`.
+6. Tag `v1.0` once the model comparison is in.
 
 **Local machine state.** Installed with Homebrew: `openjdk@17`, `terraform` 1.16.4,
 the Databricks CLI (v1.17.0); Colima and Docker were already there (Colima is stopped
@@ -221,14 +222,17 @@ June cohorts confirmed performance held. The feed-health check caught the stress
 scenario's silent identity feed on its first full day. Fixed on the way: the first
 version only noticed the silent feed after ten days (see DECISIONS.md).
 
-### Phase 9 — Databricks (2026-09-24): ready, not deployed
+### Phase 9 — Databricks (2026-09-24; run 2026-09-25)
 
 Done: Asset Bundle with schema, volumes and a job running phases 2-5 from the wheel on
 serverless; `make databricks-deploy`, `make databricks-upload`, `make databricks-run`;
 `docs/databricks.md`; a test that every task is a valid CLI command in pipeline order.
 The wheel was built and run outside the repository (packaged configs, `--data-dir`).
-Blocked on: the owner's Free Edition workspace and `databricks auth login` (none on this
-machine). The Databricks CLI (v1.17.0) is installed.
+Run 2026-09-25 on the owner's workspace (`databricks auth login`, Databricks CLI
+v1.17.0): all nine tasks pass on serverless (about 80 minutes, 55 of them training), and
+the results match the local run (identical data counts, LightGBM PR-AUC and policy
+money; logistic regression within 0.2% from a different scikit-learn). Five fixes were
+needed on the way, each recorded in DECISIONS.md.
 
 ### Phase 10 — Cloud slice with Terraform (2026-09-24; applied 2026-09-25)
 

@@ -149,7 +149,8 @@ flowchart TB
    weekly performance once each week's labels have arrived. Thresholds and the retrain
    rule are in [configs/monitoring.yaml](configs/monitoring.yaml).
 8. **Cloud and dashboard.** A Databricks Asset Bundle runs phases 2 to 5 as serverless
-   Jobs ([docs/databricks.md](docs/databricks.md)). Terraform builds a scale-to-zero
+   Jobs on Databricks Free Edition, and reproduces the local headline to the dollar
+   ([docs/databricks.md](docs/databricks.md)). Terraform builds a scale-to-zero
    Container App behind a budget alert ([docs/deploy_azure.md](docs/deploy_azure.md)),
    live at [ca-fraud-api…azurecontainerapps.io](https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health)
    with a demonstration model trained on synthetic data (the first request after a quiet
@@ -246,8 +247,6 @@ The full log with the options considered is in [DECISIONS.md](DECISIONS.md). The
   portfolios.
 - Streaming uses one partition and in-memory state. Restarting the processor re-warms
   from the lake.
-- The Databricks job is written and checked without credentials but has not been run:
-  it needs the owner's account.
 
 ## What production would add
 

@@ -17,6 +17,7 @@ from pathlib import Path
 import mlflow
 import numpy as np
 import pandas as pd
+from mlflow.models import infer_signature
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -97,6 +98,7 @@ def setup_mlflow(s: Settings) -> None:
         mlflow.set_tracking_uri("databricks")
         mlflow.set_registry_uri("databricks-uc")
         mlflow.set_experiment(os.environ.get("FRAUD_MLFLOW_EXPERIMENT", "/Shared/fraud-models"))
+        os.environ.setdefault("FRAUD_UC_SCHEMA", uc_schema(s.data_dir))
         return
     root = s.path("mlflow")
     root.mkdir(parents=True, exist_ok=True)
@@ -104,6 +106,29 @@ def setup_mlflow(s: Settings) -> None:
     if mlflow.get_experiment_by_name(EXPERIMENT) is None:
         mlflow.create_experiment(EXPERIMENT, artifact_location=(root / "artifacts").as_uri())
     mlflow.set_experiment(EXPERIMENT)
+
+
+def uc_schema(data_dir: Path) -> str:
+    """The Unity Catalog schema that holds the lake volume, /Volumes/<catalog>/<schema>/..."""
+    parts = Path(data_dir).parts
+    if len(parts) > 3 and parts[1] == "Volumes":
+        return f"{parts[2]}.{parts[3]}"
+    return "workspace.fraud"
+
+
+def registered_name(short: str) -> str:
+    """`fraud-<short>` in the local registry; `<catalog>.<schema>.fraud_<short>` in Unity
+    Catalog, whose model names have three levels and no hyphens."""
+    if mlflow.get_registry_uri().startswith("databricks-uc"):
+        schema = os.environ.get("FRAUD_UC_SCHEMA", "workspace.fraud")
+        return f"{schema}.fraud_{short.replace('-', '_')}"
+    return f"fraud-{short}"
+
+
+def _signature(x: pd.DataFrame, predict):
+    # Unity Catalog registers only models with an input and output signature.
+    sample = x.head(200)
+    return infer_signature(sample, predict(sample))
 
 
 def _log_metrics(prefix: str, m: dict) -> None:
@@ -204,7 +229,9 @@ def fit_logreg(train: pd.DataFrame, valid: pd.DataFrame) -> tuple[ModelBundle, d
         mlflow.sklearn.log_model(
             pipe,
             name="model",
-            registered_model_name="fraud-logreg",
+            registered_model_name=registered_name("logreg"),
+            signature=_signature(xva, pipe.predict_proba),
+            pyfunc_predict_fn="predict_proba",
             # skops refuses unknown callables unless they are named as trusted.
             skops_trusted_types=[f"{__name__}._signed_log", "numpy.dtype"],
         )
@@ -273,7 +300,12 @@ def fit_lightgbm(
         mlflow.log_params({f"best_{k}": v for k, v in params.items()} | {"calibration": cal.method})
         _log_metrics("valid", m)
         if register:
-            mlflow.lightgbm.log_model(booster, name="model", registered_model_name=f"fraud-{name}")
+            mlflow.lightgbm.log_model(
+                booster,
+                name="model",
+                registered_model_name=registered_name(name),
+                signature=_signature(xva, booster.predict),
+            )
     return bundle, m
 
 
