@@ -69,24 +69,28 @@ databricks jobs repair-run --json '{"run_id": <run>, "rerun_tasks": ["train", "e
 
 Deployed to the owner's Free Edition workspace and run end to end on serverless compute:
 bronze 1.6 min, silver 1.2, gold 0.6, profile 0.8, features 0.8, check_pit 13.2,
-train 55.5, evaluate 1.5 and policy 3.8. It reproduces the local run:
+train 55.5, evaluate 1.5 and policy 3.8. After the chargeback-history features were
+adopted, the job was redeployed and its tasks from `features` onward run again on the
+same lake (features 1.9 min, check_pit 15.1, train 35.1, evaluate 1.4, policy 3.7). That
+second run reproduces the local one:
 
 | | Local | Databricks |
 |---|---|---|
-| Rows, fraud and dollars in each split; card keys | 590,540 rows; 217,850 keys | identical |
-| Point-in-time check | 76,415 values, 0 differences | 76,347 values, 0 differences |
-| LightGBM PR-AUC, validation / test | 0.6156 / 0.5474 | 0.6156 / 0.5474 |
+| Card keys | 217,850 | 217,850 |
+| Point-in-time check (20 aggregates) | 89,900 values, 0 differences | 89,820 values, 0 differences |
+| LightGBM PR-AUC, validation / test | 0.7081 / 0.6377 | 0.7081 / 0.6377 |
 | Rules baseline PR-AUC, validation / test | 0.0519 / 0.0469 | identical |
-| Logistic regression PR-AUC, test | 0.1128 | 0.1126 |
+| Logistic regression PR-AUC, test | 0.3538 | 0.3525 |
 | Chosen policy | LightGBM, expected loss | the same |
-| **Chosen policy on May: cost, fraud value caught** | **$278,535, 59.8%** | **$278,535, 59.8%** |
+| **Chosen policy on May: cost, fraud value caught** | **$231,926, 66.7%** | **$231,926, 66.7%** |
 | Rules baseline on May | $474,219 | $474,219 |
-| Logistic-regression policy on May | $472,022 | $472,921 |
+| Logistic-regression policy on May | $368,018 | $367,482 |
 
-LightGBM (4.7.0 locally, 4.6.0 on serverless) gives the same model to six decimals. The
-logistic regression moves by 0.2%: scikit-learn is 1.9.1 locally and 1.7.2 on serverless.
-The point-in-time sample checked 4,491 rows rather than 4,495 because Spark returns rows
-in a different order there, so the seeded top-up sample differs; both found no
-differences. The job's two test-month reads are logged as a reproduction, not a new
-result. The comparison was run with the reports downloaded to `data/databricks-reports/`
-(not committed).
+The first run, before the chargeback history, matched in the same way ($278,535 and
+59.8% on both). LightGBM (4.7.0 locally, 4.6.0 on serverless) gives the same model to six
+decimals. The logistic regression moves by under 0.4%: scikit-learn is 1.9.1 locally and
+1.7.2 on serverless. The point-in-time sample differs by a few rows because Spark returns
+rows in a different order there, so the seeded top-up sample differs; both found no
+differences. Each run's test-month reads are logged in the workspace as a reproduction,
+not a new result. The comparison was run with the reports downloaded to
+`data/databricks-reports/` (not committed).
