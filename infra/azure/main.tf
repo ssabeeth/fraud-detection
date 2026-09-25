@@ -42,6 +42,13 @@ resource "azurerm_container_app_environment" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   tags                = local.tags
+
+  # Azure gives every new environment this profile: pay per use, no fixed fee.
+  # Declaring it keeps plans clean; without it, each plan tries to remove it.
+  workload_profile {
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }
 }
 
 resource "azurerm_container_app" "api" {
@@ -49,6 +56,7 @@ resource "azurerm_container_app" "api" {
   container_app_environment_id = azurerm_container_app_environment.this.id
   resource_group_name          = azurerm_resource_group.this.name
   revision_mode                = "Single"
+  workload_profile_name        = "Consumption"
   tags                         = local.tags
 
   template {
