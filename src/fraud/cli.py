@@ -151,6 +151,13 @@ def _cmd_stream(args: argparse.Namespace) -> int:
     return 1 if result["parity"]["feature_mismatches"] else 0
 
 
+def _cmd_dashboard(args: argparse.Namespace) -> int:
+    from fraud.policy.dashboard import build
+
+    print(build(out=args.out))
+    return 0
+
+
 def _cmd_explain(_: argparse.Namespace) -> int:
     from fraud.explain.experiment import run
     from fraud.spark import get_spark
@@ -251,6 +258,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="recompute only the validation ranking comparison and re-render the report",
     )
     p.set_defaults(func=_cmd_policy)
+
+    p = sub.add_parser("dashboard", help="write site/index.html from the export and the report")
+    p.add_argument("--out", type=Path, default=None, help="default: site/index.html")
+    p.set_defaults(func=_cmd_dashboard)
 
     p = sub.add_parser("explain", help="explainable-only model, segment checks, global SHAP")
     p.set_defaults(func=_cmd_explain)

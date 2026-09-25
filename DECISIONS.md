@@ -631,3 +631,17 @@ the reported run, not a new result, so `--test-note` labels those reads in the w
 test-read log. The run was repaired from `check_pit` onward rather than restarted,
 because bronze deletes the uploaded CSVs once they are converted.
 
+## 2026-09-25 — Dashboard: a page built by code on GitHub Pages, not Tableau Public
+
+The owner decided not to use Tableau. **Options:** a Streamlit app (as in the owner's
+other repositories), a hosted notebook, or a static page. **Decision:** a static page,
+`site/index.html`, written by `fraud dashboard` from the same daily export and the policy
+report, and published by a GitHub Pages workflow. It needs no account beyond GitHub and
+costs nothing, and like every other number in the repository it comes from code: a test
+rebuilds the page and fails if the committed copy differs, and checks the headline figures
+against `reports/policy_results.json`. It has the five views the Tableau guide planned
+(month totals, cost per day, cumulative saving against the rules, cost breakdown, the
+review queue against capacity) and the sensitivity table, drawn as inline SVG with hover
+values, no JavaScript and no external files, in light and dark themes. Streamlit would
+need a running server and the owner's Streamlit account for a page that never changes.
+`docs/tableau.md` is removed; the CSV stays, for any BI tool.
