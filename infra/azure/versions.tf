@@ -11,4 +11,7 @@ terraform {
 provider "azurerm" {
   features {}
   subscription_id = var.subscription_id
+  # A new subscription has Container Apps (Microsoft.App) switched off, and the
+  # provider's default "core" set does not include it. Registering it is free.
+  resource_providers_to_register = ["Microsoft.App"]
 }
