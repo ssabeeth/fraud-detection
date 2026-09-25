@@ -193,6 +193,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--data-dir", help="data directory (overrides FRAUD_DATA_DIR), e.g. a Databricks volume"
     )
     parser.add_argument("--reports-dir", help="where reports go (overrides FRAUD_REPORTS_DIR)")
+    parser.add_argument(
+        "--test-note",
+        help="note added to every test-month read this run logs (sets FRAUD_TEST_PURPOSE_NOTE)",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("config", help="print the resolved configuration")
@@ -277,6 +281,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.reports_dir:
         os.environ["FRAUD_REPORTS_DIR"] = args.reports_dir
         os.environ.setdefault("FRAUD_EXPORTS_DIR", str(Path(args.reports_dir) / "exports"))
+    if args.test_note:
+        os.environ["FRAUD_TEST_PURPOSE_NOTE"] = args.test_note
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",

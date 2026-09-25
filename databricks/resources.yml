@@ -98,7 +98,7 @@ resources:
             package_name: fraud
             entry_point: fraud
             parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
-                         "evaluate"]
+                         "--test-note", "${var.test_note}", "evaluate"]
         - task_key: policy
           depends_on: [{task_key: evaluate}]
           environment_key: fraud
@@ -106,4 +106,4 @@ resources:
             package_name: fraud
             entry_point: fraud
             parameters: ["--data-dir", "${var.data_dir}", "--reports-dir", "${var.data_dir}/reports",
-                         "policy"]
+                         "--test-note", "${var.test_note}", "policy"]

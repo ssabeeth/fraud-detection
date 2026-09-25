@@ -39,3 +39,16 @@ def test_bundle_targets_free_edition_and_builds_the_wheel():
     bundle = yaml.safe_load((ROOT / "databricks.yml").read_text())
     assert bundle["artifacts"]["fraud_wheel"]["type"] == "whl"
     assert "free" in bundle["targets"]
+
+
+def test_volume_paths_match_the_deployed_schema():
+    # Development mode renames the schema to dev_<user>_<schema>, which would leave the
+    # job's /Volumes/<catalog>/<schema>/... paths pointing at nothing.
+    bundle = yaml.safe_load((ROOT / "databricks.yml").read_text())
+    assert bundle["targets"]["free"].get("mode") != "development"
+    variables = {k: v["default"] for k, v in bundle["variables"].items()}
+    for name in ("data_dir", "raw_dir"):
+        assert variables[name].startswith("/Volumes/${var.catalog}/${var.schema}/"), name
+    makefile = (ROOT / "Makefile").read_text()
+    assert "dbfs:/Volumes/workspace/fraud/raw/" in makefile
+    assert (variables["catalog"], variables["schema"]) == ("workspace", "fraud")

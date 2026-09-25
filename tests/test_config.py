@@ -67,3 +67,14 @@ def test_data_dir_env_override(tmp_path, monkeypatch):
 def test_cli_config(capsys):
     assert main(["config"]) == 0
     assert '"label_delay_days": 30' in capsys.readouterr().out
+
+
+def test_cli_test_note_labels_test_reads(tmp_path, monkeypatch):
+    from fraud.model.data import list_test_touches, record_test_touch
+
+    # set first so monkeypatch restores the variable after main() changes it
+    monkeypatch.setenv("FRAUD_TEST_PURPOSE_NOTE", "")
+    assert main(["--test-note", "a reproduction", "config"]) == 0
+    log_path = tmp_path / "t.jsonl"
+    record_test_touch("phase 4: metrics", log_path)
+    assert list_test_touches(log_path)[0]["purpose"] == "phase 4: metrics (a reproduction)"
