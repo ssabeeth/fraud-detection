@@ -44,8 +44,19 @@ def test_scorer_matches_offline_features_scores_and_policy(gold, bundle, fixture
     test_start = lake.split_bounds_seconds()["test"][0]
     history = gold[gold["TransactionDT"] < test_start]
     window = gold[gold["TransactionDT"] >= test_start].reset_index(drop=True)
-    scorer.warm(records(history, EVENT_FIELDS))
-    decisions = [scorer.decide(e) for e in records(window, EVENT_COLUMNS)]
+    # older labels at warm-up, the rest released during the window, as in the stream
+    scorer.warm(records(history, [*EVENT_FIELDS, "isFraud"]), labels_before=test_start)
+    delay = lake.label_delay_seconds
+    earlier = history[history["TransactionDT"] >= test_start - delay]
+    end = int(window["TransactionDT"].max()) + 1
+    decisions = []
+    for _, kind, payload in timeline(
+        window[[*EVENT_COLUMNS, "isFraud"]], earlier, test_start, end, delay
+    ):
+        if kind == TX:
+            decisions.append(scorer.decide({k: payload[k] for k in payload if k != "isFraud"}))
+        else:
+            scorer.observe_label(payload)
 
     for d, (_, row) in zip(decisions, window.iterrows(), strict=True):
         for name in AGGREGATE_NAMES:

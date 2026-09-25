@@ -29,6 +29,7 @@ from fraud.features.definitions import AGGREGATE_NAMES
 from fraud.features.parity import EVENT_FIELDS, _same
 from fraud.lakehouse.tables import GOLD_FEATURES, SILVER_TRANSACTIONS, table_path
 from fraud.stream.messages import silver_between
+from fraud.stream.producer import LABEL_FIELDS
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +56,13 @@ def recreate_topics(s: Settings) -> None:
 
 
 def _processor_main(
-    s: Settings, models_dir: str, warm_path: str, stats_path: str, ready, idle_seconds: float
+    s: Settings,
+    models_dir: str,
+    warm_path: str,
+    stats_path: str,
+    ready,
+    idle_seconds: float,
+    labels_before: int,
 ) -> None:
     from confluent_kafka import Consumer, Producer
 
@@ -71,8 +78,11 @@ def _processor_main(
     warm = pd.read_parquet(warm_path)
     t0 = time.perf_counter()
     n = scorer.warm(
-        {k: (None if isinstance(v, float) and v != v else v) for k, v in r.items()}
-        for r in warm.to_dict("records")
+        (
+            {k: (None if isinstance(v, float) and v != v else v) for k, v in r.items()}
+            for r in warm.to_dict("records")
+        ),
+        labels_before=labels_before,
     )
     log.info(
         "warmed feature state with %s transactions in %.1f s", f"{n:,}", time.perf_counter() - t0
@@ -108,9 +118,8 @@ def replay_and_process(
     lo, hi = s.to_seconds(start), s.to_seconds(end)
     delay = s.label_delay_seconds
     window = silver_between(spark, s, lo, hi)
-    earlier = silver_between(spark, s, lo - delay, lo)[
-        ["TransactionID", "TransactionDT", "isFraud"]
-    ]
+    # their labels are released during the window; older ones are applied at warm-up
+    earlier = silver_between(spark, s, lo - delay, lo)[LABEL_FIELDS]
     work = s.path("stream")
     work.mkdir(parents=True, exist_ok=True)
     warm_path, stats_path = work / "warm.parquet", work / "processor_stats.json"
@@ -118,7 +127,7 @@ def replay_and_process(
         spark.read.format("delta")
         .load(table_path(s, SILVER_TRANSACTIONS))
         .filter(F.col("TransactionDT") < lo)
-        .select(*EVENT_FIELDS)
+        .select(*EVENT_FIELDS, "isFraud")
         .orderBy("TransactionDT", "TransactionID")
         .toPandas()
         .to_parquet(warm_path)
@@ -128,7 +137,15 @@ def replay_and_process(
     ready = ctx.Event()
     proc = ctx.Process(
         target=_processor_main,
-        args=(s, str(s.path("models")), str(warm_path), str(stats_path), ready, idle_seconds),
+        args=(
+            s,
+            str(s.path("models")),
+            str(warm_path),
+            str(stats_path),
+            ready,
+            idle_seconds,
+            lo,
+        ),
     )
     proc.start()
     if not ready.wait(timeout=900):

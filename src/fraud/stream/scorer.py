@@ -13,6 +13,7 @@ import time
 
 import numpy as np
 
+from fraud.features.definitions import LABEL_DELAY
 from fraud.features.online import OnlineFeatures
 from fraud.model.bundle import ModelBundle
 from fraud.policy.costs import ACTION_NAMES, APPROVE, DECLINE, REVIEW
@@ -30,13 +31,23 @@ class OnlineScorer:
         self._day: int | None = None
         self._reviews_today = 0
 
-    def warm(self, history) -> int:
-        """Feed earlier transactions through the feature state (no scoring)."""
+    def warm(self, history, labels_before: int | None = None) -> int:
+        """Feed earlier transactions through the feature state (no scoring). With
+        ``labels_before``, also apply the labels released before that time (those of
+        transactions more than ``LABEL_DELAY`` earlier); later ones come from the stream."""
         n = 0
+        labelled = []
         for event in history:
             self.features.process(event)
             n += 1
+            if labels_before is not None and event["TransactionDT"] + LABEL_DELAY < labels_before:
+                labelled.append(event)
+        for event in labelled:
+            self.features.observe_label(event)
         return n
+
+    def observe_label(self, label: dict) -> None:
+        self.features.observe_label(label)
 
     def decide(self, event: dict) -> dict:
         t0 = time.perf_counter()

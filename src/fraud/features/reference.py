@@ -13,12 +13,26 @@ import math
 import numpy as np
 import pandas as pd
 
-from fraud.features.definitions import AGGREGATES, STD_EPSILON, Aggregate
+from fraud.features.definitions import (
+    AGGREGATES,
+    LABEL_DELAY,
+    LABEL_KINDS,
+    STD_EPSILON,
+    Aggregate,
+)
 
 
 def _one(a: Aggregate, prior: pd.DataFrame, row: pd.Series):
     """One aggregate from ``prior``: the entity's transactions strictly before ``row``."""
     t = row["TransactionDT"]
+    if a.kind in LABEL_KINDS:
+        known = prior[prior["TransactionDT"] < t - LABEL_DELAY]  # labels that had arrived
+        frauds, labelled = int(known["isFraud"].sum()), len(known)
+        if a.kind == "known_frauds":
+            return frauds
+        if a.kind == "known_labelled":
+            return labelled
+        return frauds / labelled if labelled else None
     h = prior if a.window is None else prior[prior["TransactionDT"] >= t - a.window]
     amounts = h["TransactionAmt"].to_numpy(dtype=float)
     if a.kind == "count":

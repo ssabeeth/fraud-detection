@@ -78,3 +78,9 @@ def test_cli_test_note_labels_test_reads(tmp_path, monkeypatch):
     log_path = tmp_path / "t.jsonl"
     record_test_touch("phase 4: metrics", log_path)
     assert list_test_touches(log_path)[0]["purpose"] == "phase 4: metrics (a reproduction)"
+
+
+def test_label_delay_in_the_features_is_the_configured_one():
+    from fraud.features.definitions import LABEL_DELAY
+
+    assert load_settings().label_delay_seconds == LABEL_DELAY

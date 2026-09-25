@@ -26,6 +26,7 @@ from fraud.stream.messages import encode, records
 log = logging.getLogger(__name__)
 
 TX, LABEL = 0, 1
+LABEL_FIELDS = ["TransactionID", "TransactionDT", "isFraud", "card1", "addr1", "D1"]
 
 
 def timeline(
@@ -44,17 +45,24 @@ def timeline(
     """
     labels_until = end if labels_until is None else labels_until
     txs = ((int(r["TransactionDT"]), TX, r) for r in records(window))
-    labelled = pd.concat([earlier, window])[["TransactionID", "TransactionDT", "isFraud"]]
+    labelled = pd.concat([earlier, window])[LABEL_FIELDS]
     labelled = labelled.assign(released_at=labelled["TransactionDT"] + delay)
     labelled = labelled[
         (labelled["released_at"] >= start) & (labelled["released_at"] < labels_until)
     ]
     labelled = labelled.sort_values(["released_at", "TransactionID"], kind="stable")
-    labels = (
-        (int(r["released_at"]), LABEL, {k: int(v) for k, v in r.items()})
-        for r in labelled.to_dict("records")
-    )
+    labels = ((int(r["released_at"]), LABEL, _label(r)) for r in labelled.to_dict("records"))
     yield from heapq.merge(txs, labels, key=lambda x: (x[0], x[1]))
+
+
+def _label(r: dict) -> dict:
+    """A chargeback notice: the transaction it is for, its card fields and the label."""
+    out = {k: int(r[k]) for k in ("TransactionID", "TransactionDT", "isFraud", "released_at")}
+    for k in ("card1", "addr1", "D1"):
+        v = r.get(k)
+        if v is not None and not (isinstance(v, float) and v != v):
+            out[k] = v
+    return out
 
 
 def replay(
@@ -76,7 +84,9 @@ def replay(
             if wait > 0:
                 time.sleep(wait)
         if kind == TX:
-            payload = {**payload, "_sent_at": time.time()}
+            # How many labels went out before this transaction: the processor applies
+            # exactly those first, so it sees what the offline features assume.
+            payload = {**payload, "_sent_at": time.time(), "_labels_before": counts["labels"]}
             producer.produce(
                 topics["transactions"], key=str(payload["TransactionID"]), value=encode(payload)
             )
