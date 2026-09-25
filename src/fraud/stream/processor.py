@@ -5,10 +5,11 @@ with every transaction before the replay window, so the first streamed event alr
 has its full history. It stops after ``idle_seconds`` without a message.
 
 It also reads the labels topic, because the card's chargeback history is a feature. Each
-transaction says how many labels were published before it (``_labels_before``); it is
-scored once that many have been applied, so it sees exactly the labels released before
-it, whatever order the two topics are read in. A transaction waits only while one of
-those labels is still in flight.
+transaction says how many labels were published before it (``_labels_before``). Labels
+are buffered as they arrive and applied in order up to exactly that many before the
+transaction is scored, never more, so it sees the labels released before it and none
+released after, whatever order the two topics are read in. A transaction waits only
+while one of its labels is still in flight.
 """
 
 from __future__ import annotations
@@ -37,7 +38,8 @@ def run(
     consumer.subscribe([topics["transactions"], topics["labels"]])
     processing_ms, end_to_end_ms = [], []
     n = labels_applied = 0
-    waiting: deque = deque()
+    waiting: deque = deque()  # transactions, in order
+    labels: deque = deque()  # labels read but not yet due, in order
     first = last = None
     idle_since = time.perf_counter()
 
@@ -66,11 +68,16 @@ def run(
             raise RuntimeError(msg.error())
         idle_since = time.perf_counter()
         if msg.topic() == topics["labels"]:
-            scorer.observe_label(decode(msg.value()))
-            labels_applied += 1
+            labels.append(decode(msg.value()))
         else:
             waiting.append((msg.key(), decode(msg.value())))
-        while waiting and waiting[0][1].get("_labels_before", 0) <= labels_applied:
+        while waiting:
+            due = waiting[0][1].get("_labels_before", 0)
+            while labels_applied < due and labels:
+                scorer.observe_label(labels.popleft())
+                labels_applied += 1
+            if labels_applied < due:
+                break  # a label this transaction needs is still in flight
             score(*waiting.popleft())
             if max_events is not None and n >= max_events:
                 break
