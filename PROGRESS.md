@@ -21,10 +21,11 @@ Every result is from the real data and is in `reports/`; the headline is in the 
 4. ~~**Azure (phase 10).**~~ Done 2026-09-25: applied budget first, then the API; live at
    <https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health>.
    Destroy with `terraform destroy` in `infra/azure` when it is no longer wanted.
-5. **Tableau (phase 11).** Build and publish the dashboard from
-   `exports/daily_policy_results.csv` following `docs/tableau.md`; add the link to the
-   README.
-6. When 3-5 are done, update this file and the README and tag `v1.0`.
+5. ~~**Tableau (phase 11).**~~ The owner chose not to use Tableau (2026-09-25). The same
+   views are a static page, `site/index.html`, published by `.github/workflows/pages.yml`
+   to <https://ssabeeth.github.io/fraud-detection/>. GitHub Pages must be switched on once, with "GitHub Actions"
+   as the source.
+6. When 3 is done, update this file and the README and tag `v1.0`.
 
 **Local machine state.** Installed with Homebrew: `openjdk@17`, `terraform` 1.16.4,
 the Databricks CLI (v1.17.0); Colima and Docker were already there (Colima is stopped
@@ -247,8 +248,14 @@ and the `Consumption` workload profile declared; both are now in the configurati
 
 Done: `exports/daily_policy_results.csv` (daily aggregates for every policy on the test
 month; a test ties its totals to `reports/policy.md`) and `docs/tableau.md` (step-by-step
-build guide). Owner's step: build and publish in Tableau Public, then add the link to the
-README.
+build guide).
+
+2026-09-25: the owner chose not to use Tableau, so `docs/tableau.md` is replaced by a
+dashboard page built by code: `fraud dashboard` (`make dashboard`) writes
+`site/index.html` from the export and `reports/policy_results.json`, with the five planned
+views plus the sensitivity table, as inline SVG with no JavaScript or external files. A
+test rebuilds it and compares it with the committed copy and the report's numbers; the
+Pages workflow publishes it.
 
 ### Phase 12 — README (2026-09-24)
 
