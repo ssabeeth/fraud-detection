@@ -764,3 +764,18 @@ three aggregates in `definitions.py`, `card_known_chargebacks`, `card_known_labe
   same second as a transaction is not visible to it); the API test checks the three
   features against the offline table.
 
+## 2026-09-25 — Failure: the stream counted chargebacks early, and parity caught it
+
+The first full-speed replay after adding the chargeback history failed the stream parity
+check: `card_known_chargebacks` was too high on 4,166 of May's 89,326 transactions (by 1
+to 49) and 196 actions differed from the offline policy. The in-process parity check had
+passed with 15.9 million values equal, so the feature code was right; the stream was not.
+The barrier made each transaction wait for the labels published before it, but the
+processor applied every label as soon as it read one, and at full speed it read the
+labels topic ahead of the transactions, so chargebacks from later in May reached earlier
+decisions. **Fix:** labels are buffered and applied in order up to exactly each
+transaction's `_labels_before`. `tests/test_processor.py` feeds the two topics in three
+orders (labels first, transactions first, interleaved) and fails on the old processor.
+The Kafka test on the fixtures had passed because its topics happened to be read in a
+harmless order, which is why the new test does not rely on the broker.
+
