@@ -58,7 +58,12 @@ def recompute(raw: pd.DataFrame, rows: pd.DataFrame) -> pd.DataFrame:
     subset of it (with TransactionID) whose features are wanted.
     """
     entities = sorted({a.entity for a in AGGREGATES})
-    groups = {e: dict(tuple(raw.groupby(e, sort=False))) for e in entities}
+    # Only the keys the sampled rows need, each with its whole history: splitting all of
+    # raw into one frame per key (217,850 card keys) is what made this slow.
+    groups = {}
+    for e in entities:
+        wanted = raw[raw[e].isin(set(rows[e].dropna()))]
+        groups[e] = dict(tuple(wanted.groupby(e, sort=False)))
     out = []
     for _, row in rows.iterrows():
         rec = {"TransactionID": row["TransactionID"]}

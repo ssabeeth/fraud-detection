@@ -32,6 +32,9 @@ artifacts:
     type: whl
     build: uv build --wheel
     path: .
+    # Adds a build timestamp to the wheel's version, so serverless compute does not reuse
+    # a cached install of an earlier build with the same version number.
+    dynamic_version: true
 
 include:
   - databricks/*.yml
