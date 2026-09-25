@@ -91,7 +91,9 @@ class ModelBundle:
         d = root / self.name
         d.mkdir(parents=True, exist_ok=True)
         if self.kind == "lightgbm":
-            self.model.save_model(str(d / "model.lgb"))
+            # One write: save_model() appends the category levels to the file afterwards,
+            # and Databricks volumes do not support appending ("Illegal seek").
+            (d / "model.lgb").write_text(self.model.model_to_string())
         elif self.kind == "logreg":
             joblib.dump(self.model, d / "model.joblib")
         else:

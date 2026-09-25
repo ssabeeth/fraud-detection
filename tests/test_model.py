@@ -1,5 +1,8 @@
 """Metrics, rules, calibration, preprocessing and model bundles."""
 
+import builtins
+import io
+
 import mlflow
 import numpy as np
 import pandas as pd
@@ -126,7 +129,21 @@ def test_registered_names_follow_the_registry(monkeypatch):
     assert t.registered_name("lightgbm_explainable") == "main.risk.fraud_lightgbm_explainable"
 
 
-def test_test_touches_are_logged(tmp_path):
+def _forbid_appends(mp: pytest.MonkeyPatch) -> None:
+    """Databricks volumes reject appends ("Illegal seek"); fail any file opened for one."""
+    real_open = io.open
+
+    def guarded(file, mode="r", *args, **kwargs):
+        if "a" in mode:
+            raise OSError(29, f"append to {file} (not supported on Databricks volumes)")
+        return real_open(file, mode, *args, **kwargs)
+
+    mp.setattr(builtins, "open", guarded)
+    mp.setattr(io, "open", guarded)
+
+
+def test_test_touches_are_logged(tmp_path, monkeypatch):
+    _forbid_appends(monkeypatch)
     log = tmp_path / "touches.jsonl"
     record_test_touch("unit test", log)
     record_test_touch("again", log)
@@ -173,7 +190,9 @@ def test_train_save_load_predict(frames, mlflow_tmp, tmp_path, monkeypatch):
         assert info.signature.inputs and info.signature.outputs, short
     for bundle, metrics in fitted:
         assert 0.0 < metrics["pr_auc"] <= 1.0
-        path = bundle.save(tmp_path)
+        with pytest.MonkeyPatch.context() as mp:
+            _forbid_appends(mp)
+            path = bundle.save(tmp_path)
         loaded = ModelBundle.load(path)
         np.testing.assert_allclose(loaded.predict(valid), bundle.predict(valid), rtol=1e-9)
         # one event on its own scores the same as in a batch
