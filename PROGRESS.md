@@ -20,17 +20,23 @@ Branch `phase-4b-experiments` (not merged). Done and committed on it:
   the stream (labels topic, `_labels_before` barrier) and the API; all 100 tests pass,
   including the Kafka ones. `docs/features.md` regenerated.
 
-Next, in order (each writes its report; test-month reads are logged):
+Done since (all committed on the branch): features rebuilt (point-in-time 89,900 values
+and parity 15.9M values, 0 differences); retrained and May scored once more ($231,926,
+66.7% caught, 51% below the rules; 11 logged test reads); explainability, cards and
+dashboard regenerated; a stream bug found and fixed (labels applied early; see
+DECISIONS.md) with stream parity then 0 mismatches and every action equal; Databricks
+rerun from `features` reproduces the new headline; README, DECISIONS and
+docs/databricks.md updated.
 
-1. `uv run fraud features`, `uv run fraud check-pit --sample 3000`, `uv run fraud check-parity`.
-2. `FRAUD_TEST_PURPOSE_NOTE="phase 4b: model retrained with the card's chargeback history"`
-   then `uv run fraud train`, `uv run fraud evaluate`, `uv run fraud policy`.
-3. `uv run fraud explain`, `uv run fraud cards`, `make dashboard`.
-4. With Redpanda up (`colima start`, `docker compose up -d`): `uv run fraud stream`
-   (speed-up 0) and `uv run fraud stream --speedup 1800`, then `uv run fraud monitor`.
-5. Rewrite the README headline and results from the new reports (keep the old headline
-   as the result before the change), DECISIONS.md result entry, then CI, merge, tag.
-6. Databricks: redeploy and run the job's tasks from `features` onward; then `v1.0`.
+Still to do, in order:
+
+1. The paced replay (`fraud stream --speedup 1800`) and `fraud monitor` were started in
+   the background at 17:37 (log: the session scratchpad `step4b.log`); if they did not
+   finish, run both again with Redpanda up (`colima start`, `docker compose up -d`).
+2. Update the README's latency and monitoring bullets from `reports/stream.md` and
+   `reports/monitoring.md`, and check `docs/model_card.md` reads right.
+3. Push `phase-4b-experiments`, wait for CI, merge into `main`, tag `v0.13-experiments`,
+   then tag `v1.0`. Stop Colima and prune images.
 
 ## Stopped for the owner: exact situation and next steps
 
