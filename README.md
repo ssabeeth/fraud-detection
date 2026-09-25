@@ -111,7 +111,7 @@ flowchart TB
     rp -- "Spark Structured Streaming" --> sbronze
     sbronze --> monitor["monitoring<br/>Evidently drift, feed health, delayed-label performance"]
     api --> aca["Azure Container App, scale to zero<br/>(Terraform)"]
-    policy --> export["daily aggregates CSV"] --> tableau["Tableau Public dashboard"]
+    policy --> export["daily aggregates CSV"] --> dashboard["dashboard page<br/>(GitHub Pages)"]
 ```
 
 ## How it works
@@ -153,8 +153,9 @@ flowchart TB
    Container App behind a budget alert ([docs/deploy_azure.md](docs/deploy_azure.md)),
    live at [ca-fraud-api…azurecontainerapps.io](https://ca-fraud-api.whitestone-d35cd2c9.uksouth.azurecontainerapps.io/health)
    with a demonstration model trained on synthetic data (the first request after a quiet
-   spell takes up to a minute while it starts). A daily aggregate CSV feeds a Tableau
-   Public build guide ([docs/tableau.md](docs/tableau.md)).
+   spell takes up to a minute while it starts). The daily aggregate CSV and the policy
+   report feed a [dashboard page](https://ssabeeth.github.io/fraud-detection/) on GitHub Pages, rebuilt by
+   `make dashboard` and checked by a test.
 
 ### Scoring a transaction
 
@@ -245,8 +246,8 @@ The full log with the options considered is in [DECISIONS.md](DECISIONS.md). The
   portfolios.
 - Streaming uses one partition and in-memory state. Restarting the processor re-warms
   from the lake.
-- The Databricks job and the Tableau dashboard are written and checked without
-  credentials but have not been run: they need the owner's accounts.
+- The Databricks job is written and checked without credentials but has not been run:
+  it needs the owner's account.
 
 ## What production would add
 
@@ -288,10 +289,11 @@ configs/        base.yaml (anchor, splits, label delay), costs.yaml, monitoring.
 src/fraud/      lakehouse/ features/ model/ policy/ explain/ stream/ serve/ monitor/ cli.py
 tests/          unit, point-in-time, parity, stream (Kafka), API, bundle and export tests
 reports/        generated reports and figures (aggregates only)
-docs/           feature catalogue, model and data cards, Databricks, Azure and Tableau guides
+docs/           feature catalogue, model and data cards, Databricks and Azure guides
 databricks/     Asset Bundle resources (with databricks.yml)
 infra/azure/    Terraform for the Container App and budget
 docker/         the scoring image
 scripts/        synthetic fixture generator, raw-data guard, image build
 exports/        the daily aggregate CSV for the dashboard
+site/           the dashboard page, published to GitHub Pages
 ```
