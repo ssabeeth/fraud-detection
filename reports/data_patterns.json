@@ -1,0 +1,315 @@
+{
+  "rows": 501214,
+  "first_day": "2017-12-01",
+  "last_day": "2018-04-30",
+  "imbalance": {
+    "fraud": 17549,
+    "rate": 0.03501298846400939,
+    "value_share": 0.03862128321598626
+  },
+  "months": [
+    {
+      "month": "2017-12",
+      "rows": 137321,
+      "fraud_rate": 0.02585183620859155,
+      "fraud_value": 480521.746
+    },
+    {
+      "month": "2018-01",
+      "rows": 92585,
+      "fraud_rate": 0.0400172814170762,
+      "fraud_value": 511259.955
+    },
+    {
+      "month": "2018-02",
+      "rows": 86021,
+      "fraud_rate": 0.04007161042071122,
+      "fraud_value": 483113.488
+    },
+    {
+      "month": "2018-03",
+      "rows": 101632,
+      "fraud_rate": 0.03954463161209068,
+      "fraud_value": 681448.8589999999
+    },
+    {
+      "month": "2018-04",
+      "rows": 83655,
+      "fraud_rate": 0.03380551072858765,
+      "fraud_value": 450144.87799999997
+    }
+  ],
+  "products": [
+    {
+      "product": "C",
+      "share": 0.11779599133304337,
+      "fraud_rate": 0.11376839823173726
+    },
+    {
+      "product": "H",
+      "share": 0.06074451232407714,
+      "fraud_rate": 0.046278657294882744
+    },
+    {
+      "product": "R",
+      "share": 0.06683372770912226,
+      "fraud_rate": 0.03621111708161681
+    },
+    {
+      "product": "S",
+      "share": 0.017236150626279395,
+      "fraud_rate": 0.06262298877184859
+    },
+    {
+      "product": "W",
+      "share": 0.7373896180074778,
+      "fraud_rate": 0.020750020292756837
+    }
+  ],
+  "identity": {
+    "share": 0.25025637751539265,
+    "fraud_rate_with": 0.07598539447668856,
+    "fraud_rate_without": 0.021336838911922337
+  },
+  "missing": {
+    "C": {
+      "columns": 14,
+      "mean_missing": 0.0,
+      "columns_over_half_missing": 0
+    },
+    "D": {
+      "columns": 15,
+      "mean_missing": 0.5877707592631757,
+      "columns_over_half_missing": 9
+    },
+    "M": {
+      "columns": 9,
+      "mean_missing": 0.5233697028060313,
+      "columns_over_half_missing": 4
+    },
+    "V": {
+      "columns": 339,
+      "mean_missing": 0.4306189056746032,
+      "columns_over_half_missing": 170,
+      "missingness_groups": 14
+    },
+    "identity": {
+      "columns": 38,
+      "mean_missing": 0.8443910291076424,
+      "columns_over_half_missing": 38
+    }
+  },
+  "cardinality": [
+    {
+      "column": "card1",
+      "distinct": 12914,
+      "present_share": 1.0,
+      "top_levels_cover": 0.35797882740705567
+    },
+    {
+      "column": "addr1",
+      "distinct": 330,
+      "present_share": 0.887616866248748,
+      "top_levels_cover": 0.9862144459479507
+    },
+    {
+      "column": "P_emaildomain",
+      "distinct": 59,
+      "present_share": 0.8437872844732989,
+      "top_levels_cover": 0.998909954175514
+    },
+    {
+      "column": "R_emaildomain",
+      "distinct": 60,
+      "present_share": 0.23671525535998594,
+      "top_levels_cover": 0.99851658308399
+    },
+    {
+      "column": "DeviceInfo",
+      "distinct": 1678,
+      "present_share": 0.20643876667451427,
+      "top_levels_cover": 0.8453464772397796
+    },
+    {
+      "column": "id_30",
+      "distinct": 73,
+      "present_share": 0.13666617452824542,
+      "top_levels_cover": 0.9845399202908072
+    },
+    {
+      "column": "id_31",
+      "distinct": 111,
+      "present_share": 0.24402550607125897,
+      "top_levels_cover": 0.9844246948303068
+    }
+  ],
+  "amounts": {
+    "legit_quantiles": [
+      68.5,
+      269.95,
+      1104.0
+    ],
+    "fraud_quantiles": [
+      76.604,
+      335.0,
+      994.0
+    ],
+    "cents_share_legit": 0.4826088304921795,
+    "cents_share_fraud": 0.46458487663114706,
+    "fraud_rate_with_cents": 0.033749492909005106,
+    "fraud_rate_whole_dollars": 0.03618856878755199
+  },
+  "hours": {
+    "highest": {
+      "hour": 7,
+      "fraud_rate": 0.10797694874127996
+    },
+    "lowest": {
+      "hour": 13,
+      "fraud_rate": 0.02169758984158294
+    }
+  },
+  "clients": {
+    "keys": 191368,
+    "rows_in_repeat_keys": 0.7787711436631858,
+    "repeat_keys_with_fraud": 4351,
+    "fraud_share_within_fraud_keys": 0.4252886638985268,
+    "all_fraud_keys_share": 0.39117444265686047,
+    "delayed": {
+      "rows_with_known_fraud": 0.007182560742517169,
+      "fraud_rate_known": 0.5511111111111111,
+      "fraud_rate_not_known": 0.031279264650914164,
+      "fraud_rows_with_known_fraud": 0.11305487492164795
+    },
+    "instant": {
+      "rows_with_known_fraud": 0.0475186247790365,
+      "fraud_rate_known": 0.44506025108116054,
+      "fraud_rate_not_known": 0.014556019413611732,
+      "fraud_rows_with_known_fraud": 0.6040230212547724
+    }
+  },
+  "d_columns": [
+    {
+      "column": "D1",
+      "present_share": 0.9975499487244969,
+      "cards_constant_raw": 0.20117283950617285,
+      "cards_constant_normalised": 1.0,
+      "mean_by_month": {
+        "2017-12": 72.17586530829225,
+        "2018-01": 95.79778145015824,
+        "2018-02": 97.21382485264883,
+        "2018-03": 94.14860598646436,
+        "2018-04": 111.40843520634576
+      }
+    },
+    {
+      "column": "D4",
+      "present_share": 0.7073266109885199,
+      "cards_constant_raw": 0.11374394229685562,
+      "cards_constant_normalised": 0.3157894736842105,
+      "mean_by_month": {
+        "2017-12": 126.06438219442411,
+        "2018-01": 132.36649132560692,
+        "2018-02": 134.80442282176028,
+        "2018-03": 133.23341402573146,
+        "2018-04": 160.41845082390577
+      }
+    },
+    {
+      "column": "D10",
+      "present_share": 0.8628928960483945,
+      "cards_constant_raw": 0.18933333333333333,
+      "cards_constant_normalised": 0.318,
+      "mean_by_month": {
+        "2017-12": 113.13722575407745,
+        "2018-01": 118.51095638404396,
+        "2018-02": 116.11235053768831,
+        "2018-03": 114.41154184284339,
+        "2018-04": 139.39350719024378
+      }
+    },
+    {
+      "column": "D15",
+      "present_share": 0.8395376027006428,
+      "cards_constant_raw": 0.11055157576187437,
+      "cards_constant_normalised": 0.36579426436863133,
+      "mean_by_month": {
+        "2017-12": 145.8006823780767,
+        "2018-01": 153.7250894761999,
+        "2018-02": 156.65333367302745,
+        "2018-03": 155.92033883710417,
+        "2018-04": 188.5439365476936
+      }
+    }
+  ],
+  "adversarial": {
+    "auc": 0.9805639839239119,
+    "auc_folds": [
+      0.9801384076619772,
+      0.9809867890372229,
+      0.9805667550725354
+    ],
+    "top": [
+      {
+        "feature": "email_txn_7d",
+        "gain_share": 0.39802524414651713
+      },
+      {
+        "feature": "id_31",
+        "gain_share": 0.06902034567637437
+      },
+      {
+        "feature": "id_13",
+        "gain_share": 0.05182254809256371
+      },
+      {
+        "feature": "D15",
+        "gain_share": 0.05131643805860085
+      },
+      {
+        "feature": "weekday",
+        "gain_share": 0.05011583665741777
+      },
+      {
+        "feature": "M8",
+        "gain_share": 0.03435689150561996
+      },
+      {
+        "feature": "D11",
+        "gain_share": 0.026544652532827125
+      },
+      {
+        "feature": "dist1",
+        "gain_share": 0.025526118013955965
+      },
+      {
+        "feature": "D10",
+        "gain_share": 0.02334978231308666
+      },
+      {
+        "feature": "P_emaildomain",
+        "gain_share": 0.01917051341143036
+      },
+      {
+        "feature": "M2",
+        "gain_share": 0.018964645773967344
+      },
+      {
+        "feature": "card_txn_prior",
+        "gain_share": 0.017298199093366082
+      },
+      {
+        "feature": "card_secs_since_prev",
+        "gain_share": 0.015645212096316523
+      },
+      {
+        "feature": "M3",
+        "gain_share": 0.015626924415948016
+      },
+      {
+        "feature": "C12",
+        "gain_share": 0.011592080801386911
+      }
+    ]
+  }
+}
