@@ -26,6 +26,17 @@ def verdict(result: dict) -> list[str]:
         d = s["cost_vs_lightgbm"]
         pct = [x / c for x, c in zip(d, base["total_cost"], strict=True)]
         name = NAMES[lib]
+        gaps = s["pr_auc_vs_lightgbm"]
+        if all(g < 0 for g in gaps):
+            lines.append(
+                f"LightGBM's PR-AUC is higher than {name}'s in all {len(gaps)} months, by "
+                f"{-max(gaps):.3f} to {-min(gaps):.3f}."
+            )
+        elif all(g > 0 for g in gaps):
+            lines.append(
+                f"{name}'s PR-AUC is higher than LightGBM's in all {len(gaps)} months, by "
+                f"{min(gaps):.3f} to {max(gaps):.3f}."
+            )
         if all(x < 0 for x in d):
             lines.append(
                 f"{name} is cheaper than LightGBM in all {len(d)} months, by "
@@ -58,7 +69,7 @@ def verdict(result: dict) -> list[str]:
     else:
         lines.append(
             "No library is cheaper than LightGBM in every month, so the evidence supports "
-            "keeping it, and its exact, fast SHAP reasons (below) are a further reason."
+            "keeping it; its fast exact SHAP reasons (the last column) are a further reason."
         )
     return lines
 
@@ -117,7 +128,7 @@ def write_report(result: dict, out_dir: Path) -> Path:
             + (f"{lat:.1f} ms" if lat is not None else "—")
             + " |"
         )
-    lines += ["", *verdict(result), ""]
+    lines += ["", *(f"- {v}" for v in verdict(result)), ""]
     base = summary["lightgbm"]["pr_auc"]
     lines += [
         f"Month to month, LightGBM's PR-AUC runs from {min(base):.3f} to {max(base):.3f}; "

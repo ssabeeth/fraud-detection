@@ -664,3 +664,33 @@ because scikit-learn is 1.7.2 there and 1.9.1 locally. The two test-month reads 
 made are logged in the workspace as a reproduction, so the count of reported test results
 is unchanged. The full table is in `docs/databricks.md`.
 
+## 2026-09-25 — Why LightGBM, and a three-month check against XGBoost and CatBoost
+
+The brief named LightGBM, and until now the choice was not argued or tested; the owner
+asked for both. **Why a gradient-boosted tree model at all:** the table is wide (452
+features), mostly anonymised, full of gaps (the V and identity columns) and has
+categories (card network, email domain, device); tree ensembles remain the strongest
+general method on such data, handle missing values and categories without imputation or
+one-hot encoding, and give exact per-feature contributions (TreeSHAP) cheaply, which the
+streaming path needs. Against the baselines on May: PR-AUC 0.547 against 0.113 and
+0.047, and $278,535 against $472,022 and $474,219 for the policies built on them.
+
+**Why LightGBM rather than XGBoost or CatBoost** was the open question. One validation
+month is thin evidence, so `fraud compare-models` uses three expanding-window folds that
+score February, March and April once each (training on every earlier month; early
+stopping and calibration on the last 14 days of each training window) and never reads
+May; the test-read log is unchanged. Each library gets four settings, the same features
+and weighting and a learning rate of 0.1; money is the same untuned expected-loss policy
+for every model, so nothing is tuned on the month being scored.
+
+**Result** (`reports/model_comparison.md`): LightGBM's PR-AUC is the highest in all three
+months (mean 0.543; XGBoost 0.528; CatBoost 0.524).
+XGBoost ties it on money: $375,461 a month against $374,667, cheaper in March and
+dearer in February and April, so these months do not separate the two. CatBoost costs
+more in every month ($400,221 on average) and takes 44 ms for one decision with
+its SHAP values, against 4.2 ms for LightGBM and 5.9 ms for XGBoost, and about
+thirteen times as long to fit. **Decision:** keep LightGBM. The frozen model and policy
+are unchanged. Month to month, LightGBM's own PR-AUC moves between
+0.523 and 0.556, which is the size of difference that one month
+cannot resolve.
+

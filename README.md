@@ -44,6 +44,17 @@ across time. PR-AUC of a random score is the fraud rate, 3.49%.
 Details, calibration curves and why logistic regression collapses in May are in
 [reports/model.md](reports/model.md).
 
+**Why LightGBM, checked across three months.** The brief named LightGBM, so the choice
+was tested rather than assumed: LightGBM, XGBoost and CatBoost, each with four settings
+and the same 452 features, were trained on every month before February, March and April
+in turn and scored on that month once, without reading May. LightGBM had the highest
+PR-AUC in all three months (mean 0.543, against 0.528
+and 0.524); XGBoost tied it on money (mean $375,461 a month
+against $374,667, cheaper in one month of three) and CatBoost cost more in every
+month (mean $400,221). One decision with its SHAP reasons takes
+4.2 ms with LightGBM, 5.9 ms with XGBoost and 43.8 ms with
+CatBoost. [reports/model_comparison.md](reports/model_comparison.md).
+
 ### Money (test month)
 
 | Policy (all tuned on April, same costs and capacity) | Total cost | Fraud value caught | Declines (legitimate) | Reviews (fraud) |
@@ -208,6 +219,9 @@ The full log with the options considered is in [DECISIONS.md](DECISIONS.md). The
 - **Money, not cut-offs.** Seven cost assumptions, each with a range. One tuned
   threshold. The review queue is allocated in arrival order, since a stream cannot see
   the rest of the day.
+- **LightGBM, and the check that it was right.** Gradient-boosted trees suit a wide,
+  mostly anonymised table with many gaps and categories, and give exact SHAP reasons
+  cheaply. A three-month comparison with XGBoost and CatBoost (above) backs the choice.
 - **Depth ≤ 8.** Exact SHAP for every decision in milliseconds (see Failures kept).
 - **No raw rows leave the machine.** The competition rules forbid redistribution. A
   pre-commit hook and CI reject any file with transaction IDs outside the synthetic

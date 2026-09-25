@@ -155,6 +155,13 @@ def _cmd_compare(args: argparse.Namespace) -> int:
     from fraud.model.compare import LIBRARIES, run
     from fraud.spark import get_spark
 
+    if args.report_only:
+        from fraud.model.compare_report import write_report
+
+        out = reports_dir()
+        print(write_report(json.loads((out / "model_comparison.json").read_text()), out))
+        return 0
+
     result = run(get_spark("compare"), settings(), libraries=tuple(args.libraries or LIBRARIES))
     print(json.dumps({k: round(v["mean_cost"]) for k, v in result["summary"].items()}))
     return 0
@@ -272,6 +279,9 @@ def build_parser() -> argparse.ArgumentParser:
         "compare-models", help="LightGBM vs XGBoost vs CatBoost over three months (no test)"
     )
     p.add_argument("--libraries", nargs="+", choices=["lightgbm", "xgboost", "catboost"])
+    p.add_argument(
+        "--report-only", action="store_true", help="re-render the report from the saved results"
+    )
     p.set_defaults(func=_cmd_compare)
 
     p = sub.add_parser("dashboard", help="write site/index.html from the export and the report")
