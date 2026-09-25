@@ -779,3 +779,25 @@ orders (labels first, transactions first, interleaved) and fails on the old proc
 The Kafka test on the fixtures had passed because its topics happened to be read in a
 harmless order, which is why the new test does not rely on the broker.
 
+## 2026-09-25 — Result: the chargeback history on May
+
+The model was retrained on December to March with the three `card_known_*` features by
+the usual pipeline (the same LightGBM grid, early stopping and calibration choice, all on
+April), the expected-loss policy re-tuned on April and frozen, and May scored once more.
+The two reads are logged in `reports/test_touches.jsonl` with the note "phase 4b: model
+retrained with the card's chargeback history", as is the explainability experiment's.
+
+| May 2018 | First version | With the chargeback history |
+|---|---|---|
+| Chosen policy, total cost | $278,535 | **$231,926** |
+| Fraud value caught | 59.8% | **66.7%** |
+| Against the rules ($474,219) | 41% less | **51% less** |
+| Sensitivity table, saving against the rules | 39% to 46% | **48% to 56%** (14 of 14 cheaper) |
+| LightGBM PR-AUC / ROC-AUC | 0.547 / 0.903 | **0.638 / 0.932** |
+| Explainable-only model, total cost | $371,047 | **$309,078** |
+
+May's saving ($46,609) is in line with the three folds' estimate ($49,176 a month, 95%
+interval $40,023 to $59,372), so the out-of-sample month agrees with the experiment that
+chose the change. The earlier headline stays in this log and in the git history (tag
+`v0.12-readme`).
+

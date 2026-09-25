@@ -25,6 +25,26 @@ LABELS = {
 }
 
 
+def _busy_key_sentence(top: dict) -> str:
+    """What the busiest key does to each model's alerts, from the numbers."""
+    lr, gbm = top.get("logreg"), top.get("lightgbm")
+    if not lr or not gbm:
+        return ""
+    share = lr["from_busiest_key"] / lr["rows"]
+    if share > 0.5:
+        return (
+            "Logistic regression extends its velocity terms linearly beyond anything it was "
+            "trained on, so that one legitimate key fills its alert list; LightGBM's trees "
+            "stop at the largest split they learnt."
+        )
+    return (
+        f"That key supplies {share:.0%} of logistic regression's top alerts and "
+        f"{gbm['from_busiest_key'] / gbm['rows']:.0%} of LightGBM's: the linear model still "
+        "extrapolates its velocity terms, but the chargeback history now carries more of its "
+        "ranking."
+    )
+
+
 def _pct(v: float) -> str:
     return f"{v:.1%}"
 
@@ -134,9 +154,9 @@ def _diagnostic_lines(d: dict, results: dict) -> list[str]:
         f"({d['busiest_key_fraud_rate']:.1%} fraud), probably a business account or several "
         f"cards sharing a key. {share['test']:.1%} of May's transactions come from a card with "
         f"more than 100 transactions in the previous 30 days, against {share['valid']:.2%} in "
-        "April. Logistic regression extends its velocity terms linearly beyond anything it "
-        "was trained on, so that one legitimate key fills its alert list; LightGBM's trees "
-        "stop at the largest split they learnt:",
+        "April. "
+        + _busy_key_sentence(top)
+        + " How many of each model's top alerts come from that key:",
         "",
         "| Model | Top 1% of test scores | From the busiest key | Fraud among them |",
         "|---|---|---|---|",

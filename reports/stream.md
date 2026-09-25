@@ -8,7 +8,7 @@ transaction, and Spark Structured Streaming landed all three topics in Delta bro
 - Window: 2018-05-01 to 2018-06-01, replayed as fast as possible.
 - Published: 89,326 transactions and 172,981 labels: April's labels as they fall due in May, then, with the clock running on for 30 days after the last transaction, May's own labels.
 - Processor state warmed with 501,214 earlier transactions from the lake; at the end it held 217,850 card keys, 9,500 device keys, 59 email keys.
-- Bronze rows landed: transactions 89,326, decisions 89,326, labels 172,981 (sink run 3.4 s).
+- Bronze rows landed: transactions 89,326, decisions 89,326, labels 172,981 (sink run 3.6 s).
 
 ## Parity: stream against offline
 
@@ -18,13 +18,13 @@ compared with the offline Spark feature table for the same transaction:
 | Check | Result |
 |---|---|
 | Transactions compared | 89,326 of 89,326 in the window |
-| Values compared | 1,786,520 (20 per transaction: 17 aggregates and 3 entity keys) |
+| Values compared | 2,054,498 (23 per transaction: 17 aggregates and 3 entity keys) |
 | Feature mismatches | **0** |
 | Actions equal to the frozen policy applied offline | 89,326 of 89,326 (100.00%) |
-| Largest difference in P(fraud), online vs offline | 1.24e-14 |
+| Largest difference in P(fraud), online vs offline | 8.38e-15 |
 | Decisions published without a reason | 0 |
 
-Actions taken: approve 85,237, decline 2,608, review 1,481.
+Actions taken: approve 85,224, decline 2,682, review 1,420.
 
 ## Latency and throughput
 
@@ -36,7 +36,7 @@ Kafka and any time the event waited in the topic.
 
 | Replay | Events | Decisions per second | Processing p50 / p95 / p99 (ms) | End to end p50 / p95 / p99 (ms) |
 |---|---|---|---|---|
-| as fast as possible | 89,326 | 183 | 5.39 / 5.53 / 5.68 (max 148.1) | 238948.66 / 453438.02 / 472489.55 (max 477281.2) |
+| as fast as possible | 89,326 | 258 | 3.81 / 3.94 / 4.08 (max 184.8) | 168548.56 / 319200.38 / 332541.25 (max 335912.7) |
 | 1800× real time | 89,326 | 60 | 5.80 / 9.73 / 19.03 (max 180.0) | 15.52 / 30.39 / 55.72 (max 281.1) |
 
 Replayed as fast as possible, the decisions per second are the processor's capacity,
