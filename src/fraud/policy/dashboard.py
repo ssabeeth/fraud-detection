@@ -39,6 +39,8 @@ NAMES = {
     "approve_all": "Approve everything",
 }
 
+HERO_END = "<!-- end of the coloured band -->"
+
 # Chart geometry, in SVG units; the charts scale to their container.
 W, H = 600, 240
 LEFT, RIGHT, TOP, BOTTOM = 54, 12, 12, 30
@@ -91,6 +93,7 @@ def render(daily: pd.DataFrame, results: dict) -> str:
         ),
         _kpi("Approving everything", _usd(approve["total_cost"]), "no screening at all"),
         "</section>",
+        HERO_END,
         _card(
             "Month totals by policy",
             _policy_table(test, chosen),
@@ -131,7 +134,9 @@ def render(daily: pd.DataFrame, results: dict) -> str:
         ),
         _footer(results),
     ]
-    return _page(f"Card fraud policies, {month}", "\n".join(body))
+    cut = body.index(HERO_END)
+    hero, rest = "\n".join(body[:cut]), "\n".join(body[cut + 1 :])
+    return _page(f"Card fraud policies, {month}", hero, rest)
 
 
 # --- pieces -----------------------------------------------------------------------------
@@ -422,7 +427,7 @@ def _day(ts) -> str:
     return f"{pd.Timestamp(ts).day} {pd.Timestamp(ts):%b}"
 
 
-def _page(title: str, body: str) -> str:
+def _page(title: str, hero: str, body: str) -> str:
     css = (Path(__file__).parent / "dashboard.css").read_text()
     return f"""<!doctype html>
 <html lang="en">
@@ -435,7 +440,12 @@ def _page(title: str, body: str) -> str:
 {css}</style>
 </head>
 <body>
-<main>
+<div class="hero">
+<div class="wrap">
+{hero}
+</div>
+</div>
+<main class="wrap">
 {body}
 </main>
 </body>
