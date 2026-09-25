@@ -6,3 +6,6 @@
 {"at": "2026-09-24T04:22:02+00:00", "purpose": "phase 4: frozen model metrics and the top-alert diagnostic, reports/model.md (re-run for the depth-limited LightGBM, see DECISIONS.md)"}
 {"at": "2026-09-24T04:22:28+00:00", "purpose": "phase 5: frozen policy, rules baseline and sensitivity table on test (re-run for the depth-limited LightGBM, see DECISIONS.md)"}
 {"at": "2026-09-24T04:31:30+00:00", "purpose": "phase 6: explainable-only model vs all features, and segment checks"}
+{"at": "2026-09-25T16:16:19+00:00", "purpose": "phase 4: frozen model metrics and the top-alert diagnostic, reports/model.md (phase 4b: model retrained with the card's chargeback history)"}
+{"at": "2026-09-25T16:16:44+00:00", "purpose": "phase 5: frozen policy, rules baseline and sensitivity table on test (phase 4b: model retrained with the card's chargeback history)"}
+{"at": "2026-09-25T16:20:22+00:00", "purpose": "phase 6: explainable-only model vs all features, and segment checks (phase 4b: model retrained with the card's chargeback history)"}

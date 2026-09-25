@@ -1,76 +1,76 @@
 {
   "comparison": {
     "all": {
-      "features": 452,
+      "features": 455,
       "valid": {
-        "total_cost": 217194.348,
-        "missed_fraud_cost": 185093.34,
-        "declined_legit_cost": 20590.008,
-        "review_cost": 9317.0,
-        "review_delay_cost": 2194.0,
+        "total_cost": 177102.52639999997,
+        "missed_fraud_cost": 150097.0739,
+        "declined_legit_cost": 16817.4525,
+        "review_cost": 8232.0,
+        "review_delay_cost": 1956.0,
         "fraud_value": 450144.878,
-        "fraud_value_caught": 288919.53799999994,
-        "fraud_value_caught_share": 0.6418367777140406,
-        "declines": 2014,
-        "declined_legit": 590,
-        "reviews": 1331,
-        "reviewed_fraud": 234,
-        "approved_fraud": 1170,
-        "pr_auc": 0.6156043335863359
+        "fraud_value_caught": 319383.8041,
+        "fraud_value_caught_share": 0.7095133582748441,
+        "declines": 2200,
+        "declined_legit": 517,
+        "reviews": 1176,
+        "reviewed_fraud": 198,
+        "approved_fraud": 947,
+        "pr_auc": 0.7081494824216075
       },
       "test": {
-        "total_cost": 278534.77835,
-        "missed_fraud_cost": 220030.5721,
-        "declined_legit_cost": 45617.20625,
-        "review_cost": 10367.0,
-        "review_delay_cost": 2520.0,
+        "total_cost": 231926.30454999997,
+        "missed_fraud_cost": 182467.61479999998,
+        "declined_legit_cost": 37118.68975,
+        "review_cost": 9940.0,
+        "review_delay_cost": 2400.0,
         "fraud_value": 477355.934,
-        "fraud_value_caught": 285307.3619,
-        "fraud_value_caught_share": 0.597682654763018,
-        "declines": 2608,
-        "declined_legit": 1092,
-        "reviews": 1481,
-        "reviewed_fraud": 221,
-        "approved_fraud": 1377,
-        "pr_auc": 0.5474001864722157
+        "fraud_value_caught": 318588.3192,
+        "fraud_value_caught_share": 0.6674020296142376,
+        "declines": 2682,
+        "declined_legit": 951,
+        "reviews": 1420,
+        "reviewed_fraud": 220,
+        "approved_fraud": 1163,
+        "pr_auc": 0.6376956894206873
       },
-      "review_threshold": 23.18612891453367
+      "review_threshold": 22.712404334510133
     },
     "explainable": {
-      "features": 36,
+      "features": 39,
       "valid": {
-        "total_cost": 311870.06475,
-        "missed_fraud_cost": 269349.727,
-        "declined_legit_cost": 31002.33775,
-        "review_cost": 9268.0,
-        "review_delay_cost": 2250.0,
+        "total_cost": 255908.0823,
+        "missed_fraud_cost": 223287.3843,
+        "declined_legit_cost": 24099.698,
+        "review_cost": 6895.0,
+        "review_delay_cost": 1626.0,
         "fraud_value": 450144.878,
-        "fraud_value_caught": 216353.151,
-        "fraud_value_caught_share": 0.4806300406243876,
-        "declines": 1878,
-        "declined_legit": 1007,
-        "reviews": 1324,
-        "reviewed_fraud": 199,
-        "approved_fraud": 1758,
-        "pr_auc": 0.3545432589026461
+        "fraud_value_caught": 257201.49370000002,
+        "fraud_value_caught_share": 0.5713749200985022,
+        "declines": 1928,
+        "declined_legit": 772,
+        "reviews": 985,
+        "reviewed_fraud": 172,
+        "approved_fraud": 1500,
+        "pr_auc": 0.517880052689965
       },
       "test": {
-        "total_cost": 371047.30079999997,
-        "missed_fraud_cost": 294841.80329999997,
-        "declined_legit_cost": 63123.4975,
-        "review_cost": 10500.0,
-        "review_delay_cost": 2582.0,
+        "total_cost": 309077.91579999996,
+        "missed_fraud_cost": 253071.8313,
+        "declined_legit_cost": 44406.0845,
+        "review_cost": 9352.0,
+        "review_delay_cost": 2248.0,
         "fraud_value": 477355.934,
-        "fraud_value_caught": 223852.13069999998,
-        "fraud_value_caught_share": 0.46894175761937834,
-        "declines": 2478,
-        "declined_legit": 1619,
-        "reviews": 1500,
-        "reviewed_fraud": 209,
-        "approved_fraud": 2046,
-        "pr_auc": 0.26930072818289735
+        "fraud_value_caught": 261148.1027,
+        "fraud_value_caught_share": 0.5470720778763797,
+        "declines": 2322,
+        "declined_legit": 1242,
+        "reviews": 1336,
+        "reviewed_fraud": 212,
+        "approved_fraud": 1822,
+        "pr_auc": 0.425848462335081
       },
-      "review_threshold": 23.794544309255876
+      "review_threshold": 24.449572879205615
     }
   },
   "segments": [
@@ -79,180 +79,180 @@
       "value": "W",
       "transactions": 70080,
       "fraud_rate": 0.018550228310502282,
-      "alert_rate": 0.02809646118721461,
-      "precision": 0.21381411884205181,
-      "recall": 0.32384615384615384,
-      "value_caught": 0.5130533535272325
+      "alert_rate": 0.029980022831050227,
+      "precision": 0.31461208948119945,
+      "recall": 0.5084615384615384,
+      "value_caught": 0.622091405191693
     },
     {
       "segment": "ProductCD",
       "value": "C",
       "transactions": 9478,
       "fraud_rate": 0.13621017092213547,
-      "alert_rate": 0.16005486389533657,
-      "precision": 0.6526038233355307,
-      "recall": 0.7668474051123161,
-      "value_caught": 0.8116535226014903
+      "alert_rate": 0.1512977421396919,
+      "precision": 0.6757322175732218,
+      "recall": 0.750580945003873,
+      "value_caught": 0.794554507853754
     },
     {
       "segment": "ProductCD",
       "value": "R",
       "transactions": 4201,
       "fraud_rate": 0.0507022137586289,
-      "alert_rate": 0.07331587717210188,
-      "precision": 0.5616883116883117,
-      "recall": 0.812206572769953,
-      "value_caught": 0.8601818181818182
+      "alert_rate": 0.06807902880266603,
+      "precision": 0.5909090909090909,
+      "recall": 0.7934272300469484,
+      "value_caught": 0.8455454545454546
     },
     {
       "segment": "ProductCD",
       "value": "S",
       "transactions": 2989,
       "fraud_rate": 0.04851120776179324,
-      "alert_rate": 0.028772164603546337,
-      "precision": 0.7325581395348837,
-      "recall": 0.43448275862068964,
-      "value_caught": 0.4025974025974026
+      "alert_rate": 0.02977584476413516,
+      "precision": 0.7752808988764045,
+      "recall": 0.47586206896551725,
+      "value_caught": 0.533231474407945
     },
     {
       "segment": "ProductCD",
       "value": "H",
       "transactions": 2578,
       "fraud_rate": 0.06400310318076027,
-      "alert_rate": 0.08107059736229635,
-      "precision": 0.430622009569378,
-      "recall": 0.5454545454545454,
-      "value_caught": 0.6414501257334451
+      "alert_rate": 0.07447633824670287,
+      "precision": 0.4322916666666667,
+      "recall": 0.503030303030303,
+      "value_caught": 0.5787929589270746
     },
     {
       "segment": "card4",
       "value": "visa",
       "transactions": 57467,
       "fraud_rate": 0.03600327144274105,
-      "alert_rate": 0.04433848991595176,
-      "precision": 0.44191522762951335,
-      "recall": 0.5442242629289512,
-      "value_caught": 0.5798547738054178
+      "alert_rate": 0.044042667965963074,
+      "precision": 0.4938759383642829,
+      "recall": 0.6041565973900435,
+      "value_caught": 0.6399548159993331
     },
     {
       "segment": "card4",
       "value": "mastercard",
       "transactions": 29343,
       "fraud_rate": 0.03169410080768838,
-      "alert_rate": 0.044610298878778584,
-      "precision": 0.41787624140565316,
-      "recall": 0.5881720430107527,
-      "value_caught": 0.6113379664557108
+      "alert_rate": 0.045598609549125854,
+      "precision": 0.47085201793721976,
+      "recall": 0.6774193548387096,
+      "value_caught": 0.6888650156981475
     },
     {
       "segment": "card4",
       "value": "discover",
       "transactions": 934,
       "fraud_rate": 0.08458244111349036,
-      "alert_rate": 0.1702355460385439,
-      "precision": 0.2641509433962264,
-      "recall": 0.5316455696202531,
-      "value_caught": 0.7060442291974621
+      "alert_rate": 0.16916488222698073,
+      "precision": 0.2848101265822785,
+      "recall": 0.569620253164557,
+      "value_caught": 0.8562396615350725
     },
     {
       "segment": "card4",
       "value": "american express",
       "transactions": 838,
       "fraud_rate": 0.025059665871121718,
-      "alert_rate": 0.04892601431980907,
-      "precision": 0.3170731707317073,
+      "alert_rate": 0.046539379474940336,
+      "precision": 0.3333333333333333,
       "recall": 0.6190476190476191,
-      "value_caught": 0.7118725868725869
+      "value_caught": 0.7051158301158301
     },
     {
       "segment": "card4",
       "value": "(missing)",
       "transactions": 744,
       "fraud_rate": 0.020161290322580645,
-      "alert_rate": 0.043010752688172046,
-      "precision": 0.28125,
-      "recall": 0.6,
-      "value_caught": 0.7616746406413599
+      "alert_rate": 0.04838709677419355,
+      "precision": 0.3611111111111111,
+      "recall": 0.8666666666666667,
+      "value_caught": 0.9165588646935132
     },
     {
       "segment": "card6",
       "value": "debit",
       "transactions": 67665,
       "fraud_rate": 0.026054828936673317,
-      "alert_rate": 0.028286410995344714,
-      "precision": 0.44357366771159873,
-      "recall": 0.4815655133295519,
-      "value_caught": 0.514848018234942
+      "alert_rate": 0.029867730732284048,
+      "precision": 0.5141019297377536,
+      "recall": 0.5893363584798639,
+      "value_caught": 0.622642035863959
     },
     {
       "segment": "card6",
       "value": "credit",
       "transactions": 20918,
       "fraud_rate": 0.06386843866526437,
-      "alert_rate": 0.10249545845683143,
-      "precision": 0.4099813432835821,
-      "recall": 0.6579341317365269,
-      "value_caught": 0.6798317016279876
+      "alert_rate": 0.09781049813557702,
+      "precision": 0.4393939393939394,
+      "recall": 0.6729041916167665,
+      "value_caught": 0.7110916074095339
     },
     {
       "segment": "card6",
       "value": "(missing)",
       "transactions": 743,
       "fraud_rate": 0.020188425302826378,
-      "alert_rate": 0.04172274562584118,
-      "precision": 0.2903225806451613,
-      "recall": 0.6,
-      "value_caught": 0.7616746406413599
+      "alert_rate": 0.047106325706594884,
+      "precision": 0.37142857142857144,
+      "recall": 0.8666666666666667,
+      "value_caught": 0.9165588646935132
     },
     {
       "segment": "DeviceType",
       "value": "(missing)",
       "transactions": 71013,
       "fraud_rate": 0.019193668764874036,
-      "alert_rate": 0.028417332037795895,
-      "precision": 0.22249752229930625,
-      "recall": 0.3294203961848863,
-      "value_caught": 0.5130548634776146
+      "alert_rate": 0.03027614662104122,
+      "precision": 0.3213953488372093,
+      "recall": 0.5069699192956714,
+      "value_caught": 0.621309508607012
     },
     {
       "segment": "DeviceType",
       "value": "mobile",
       "transactions": 7773,
       "fraud_rate": 0.12144603113341053,
-      "alert_rate": 0.1370127363952142,
-      "precision": 0.6262910798122066,
-      "recall": 0.7065677966101694,
-      "value_caught": 0.8034919717772528
+      "alert_rate": 0.1286504567091213,
+      "precision": 0.634,
+      "recall": 0.6716101694915254,
+      "value_caught": 0.7747063201779446
     },
     {
       "segment": "DeviceType",
       "value": "desktop",
       "transactions": 10540,
       "fraud_rate": 0.07656546489563568,
-      "alert_rate": 0.09544592030360531,
-      "precision": 0.617296222664016,
-      "recall": 0.7695167286245354,
-      "value_caught": 0.780949071463295
+      "alert_rate": 0.09032258064516129,
+      "precision": 0.657563025210084,
+      "recall": 0.7757125154894672,
+      "value_caught": 0.7734915655645148
     },
     {
       "segment": "P_emaildomain",
       "value": "yahoo.com",
       "transactions": 14972,
       "fraud_rate": 0.022241517499332085,
-      "alert_rate": 0.02504675394068929,
-      "precision": 0.25866666666666666,
-      "recall": 0.2912912912912913,
-      "value_caught": 0.3426285148480168
+      "alert_rate": 0.02771840769436281,
+      "precision": 0.42650602409638555,
+      "recall": 0.5315315315315315,
+      "value_caught": 0.5260433904503748
     },
     {
       "segment": "P_emaildomain",
       "value": "gmail.com",
       "transactions": 34423,
       "fraud_rate": 0.042181099846033174,
-      "alert_rate": 0.06260349185137844,
-      "precision": 0.42134570765661256,
-      "recall": 0.6253443526170799,
-      "value_caught": 0.659218886307353
+      "alert_rate": 0.05926270226302182,
+      "precision": 0.4612745098039216,
+      "recall": 0.6480716253443526,
+      "value_caught": 0.7115114634577029
     },
     {
       "segment": "P_emaildomain",
@@ -260,374 +260,374 @@
       "transactions": 1019,
       "fraud_rate": 0.042198233562315994,
       "alert_rate": 0.07850834151128558,
-      "precision": 0.4875,
-      "recall": 0.9069767441860465,
-      "value_caught": 0.8804890353827526
+      "precision": 0.475,
+      "recall": 0.8837209302325582,
+      "value_caught": 0.874260056504776
     },
     {
       "segment": "P_emaildomain",
       "value": "aol.com",
       "transactions": 4270,
       "fraud_rate": 0.01756440281030445,
-      "alert_rate": 0.025526932084309135,
-      "precision": 0.3944954128440367,
-      "recall": 0.5733333333333334,
-      "value_caught": 0.6241273448000768
+      "alert_rate": 0.02622950819672131,
+      "precision": 0.4017857142857143,
+      "recall": 0.6,
+      "value_caught": 0.6470173739480799
     },
     {
       "segment": "P_emaildomain",
       "value": "(missing)",
       "transactions": 16160,
       "fraud_rate": 0.0275990099009901,
-      "alert_rate": 0.02574257425742574,
-      "precision": 0.4182692307692308,
-      "recall": 0.3901345291479821,
-      "value_caught": 0.4763191534498013
+      "alert_rate": 0.02933168316831683,
+      "precision": 0.4810126582278481,
+      "recall": 0.5112107623318386,
+      "value_caught": 0.621297645582724
     },
     {
       "segment": "P_emaildomain",
       "value": "hotmail.com",
       "transactions": 6175,
       "fraud_rate": 0.06153846153846154,
-      "alert_rate": 0.06931174089068826,
-      "precision": 0.602803738317757,
-      "recall": 0.6789473684210526,
-      "value_caught": 0.5007006330226048
+      "alert_rate": 0.07206477732793522,
+      "precision": 0.5865168539325842,
+      "recall": 0.6868421052631579,
+      "value_caught": 0.5009277255338146
     },
     {
       "segment": "P_emaildomain",
       "value": "anonymous.com",
       "transactions": 5274,
       "fraud_rate": 0.02427000379218809,
-      "alert_rate": 0.034698521046643914,
-      "precision": 0.3825136612021858,
-      "recall": 0.546875,
-      "value_caught": 0.6650800767026329
+      "alert_rate": 0.0335608646188851,
+      "precision": 0.4180790960451977,
+      "recall": 0.578125,
+      "value_caught": 0.6439453158328032
     },
     {
       "segment": "P_emaildomain",
       "value": "(other)",
       "transactions": 5276,
       "fraud_rate": 0.02558756633813495,
-      "alert_rate": 0.029757391963608795,
-      "precision": 0.34394904458598724,
-      "recall": 0.4,
-      "value_caught": 0.6117911490829242
+      "alert_rate": 0.035064442759666414,
+      "precision": 0.4864864864864865,
+      "recall": 0.6666666666666666,
+      "value_caught": 0.7030445021868276
     },
     {
       "segment": "P_emaildomain",
       "value": "outlook.com",
       "transactions": 802,
       "fraud_rate": 0.12094763092269327,
-      "alert_rate": 0.20074812967581046,
-      "precision": 0.5341614906832298,
-      "recall": 0.8865979381443299,
-      "value_caught": 0.8821777892452835
+      "alert_rate": 0.18329177057356608,
+      "precision": 0.5714285714285714,
+      "recall": 0.865979381443299,
+      "value_caught": 0.8586434950892737
     },
     {
       "segment": "P_emaildomain",
       "value": "icloud.com",
       "transactions": 955,
       "fraud_rate": 0.02617801047120419,
-      "alert_rate": 0.02617801047120419,
-      "precision": 0.32,
-      "recall": 0.32,
-      "value_caught": 0.35368734722590045
+      "alert_rate": 0.028272251308900525,
+      "precision": 0.48148148148148145,
+      "recall": 0.52,
+      "value_caught": 0.46897445668251514
     }
   ],
   "shap_all_top20": [
     {
+      "feature": "card_known_fraud_rate",
+      "name": "Share of the card's labelled transactions that were fraud",
+      "family": "history aggregates (this project)",
+      "mean_abs_shap": 0.9212325757049638
+    },
+    {
       "feature": "C13",
       "name": "C13 \u2014 count of linked entities (masked)",
       "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.37138976714141847
+      "mean_abs_shap": 0.2536040996951702
     },
     {
       "feature": "TransactionAmt",
       "name": "Amount (USD)",
       "family": "readable transaction fields",
-      "mean_abs_shap": 0.255653247182084
+      "mean_abs_shap": 0.24175714617489558
     },
     {
       "feature": "P_emaildomain",
       "name": "Purchaser email domain",
       "family": "readable transaction fields",
-      "mean_abs_shap": 0.24723115219793604
+      "mean_abs_shap": 0.18375761715916156
     },
     {
       "feature": "card2",
       "name": "Card code 2",
       "family": "readable transaction fields",
-      "mean_abs_shap": 0.1973852463240558
-    },
-    {
-      "feature": "card1",
-      "name": "Card issuer code",
-      "family": "readable transaction fields",
-      "mean_abs_shap": 0.1952375889492023
+      "mean_abs_shap": 0.17630092528972113
     },
     {
       "feature": "card6",
       "name": "Card type",
       "family": "readable transaction fields",
-      "mean_abs_shap": 0.17026878176943064
+      "mean_abs_shap": 0.14680092844263043
+    },
+    {
+      "feature": "C14",
+      "name": "C14 \u2014 count of linked entities (masked)",
+      "family": "C: linked-entity counts (masked)",
+      "mean_abs_shap": 0.1439175739046903
+    },
+    {
+      "feature": "card1",
+      "name": "Card issuer code",
+      "family": "readable transaction fields",
+      "mean_abs_shap": 0.13311040793575513
     },
     {
       "feature": "D1",
       "name": "D1 \u2014 days since an earlier event (masked)",
       "family": "D: time deltas (masked)",
-      "mean_abs_shap": 0.1593607941731699
-    },
-    {
-      "feature": "C14",
-      "name": "C14 \u2014 count of linked entities (masked)",
-      "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.15266255441664717
+      "mean_abs_shap": 0.12965950099744245
     },
     {
       "feature": "C1",
       "name": "C1 \u2014 count of linked entities (masked)",
       "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.1465313026045714
-    },
-    {
-      "feature": "dist1",
-      "name": "Distance 1",
-      "family": "readable transaction fields",
-      "mean_abs_shap": 0.1415892262081654
-    },
-    {
-      "feature": "addr1",
-      "name": "Billing region",
-      "family": "readable transaction fields",
-      "mean_abs_shap": 0.13488962348285558
-    },
-    {
-      "feature": "C5",
-      "name": "C5 \u2014 count of linked entities (masked)",
-      "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.12714099446798272
-    },
-    {
-      "feature": "D4",
-      "name": "D4 \u2014 days since an earlier event (masked)",
-      "family": "D: time deltas (masked)",
-      "mean_abs_shap": 0.12299320226744721
-    },
-    {
-      "feature": "card5",
-      "name": "Card code 5",
-      "family": "readable transaction fields",
-      "mean_abs_shap": 0.119695986197297
-    },
-    {
-      "feature": "V70",
-      "name": "V70 \u2014 Vesta risk signal (masked)",
-      "family": "V: Vesta signals (masked)",
-      "mean_abs_shap": 0.11905188297423565
+      "mean_abs_shap": 0.12629422083495295
     },
     {
       "feature": "D15",
       "name": "D15 \u2014 days since an earlier event (masked)",
       "family": "D: time deltas (masked)",
-      "mean_abs_shap": 0.09898336880762729
+      "mean_abs_shap": 0.12589486033185418
+    },
+    {
+      "feature": "C5",
+      "name": "C5 \u2014 count of linked entities (masked)",
+      "family": "C: linked-entity counts (masked)",
+      "mean_abs_shap": 0.12525728914852952
+    },
+    {
+      "feature": "card5",
+      "name": "Card code 5",
+      "family": "readable transaction fields",
+      "mean_abs_shap": 0.11603904896237266
+    },
+    {
+      "feature": "dist1",
+      "name": "Distance 1",
+      "family": "readable transaction fields",
+      "mean_abs_shap": 0.10558212393448572
+    },
+    {
+      "feature": "addr1",
+      "name": "Billing region",
+      "family": "readable transaction fields",
+      "mean_abs_shap": 0.10093619703881354
+    },
+    {
+      "feature": "card_secs_since_prev",
+      "name": "Time since the card's last transaction",
+      "family": "history aggregates (this project)",
+      "mean_abs_shap": 0.09882960927452897
     },
     {
       "feature": "D2",
       "name": "D2 \u2014 days since an earlier event (masked)",
       "family": "D: time deltas (masked)",
-      "mean_abs_shap": 0.09834566976298542
+      "mean_abs_shap": 0.09843774864496675
     },
     {
-      "feature": "M6",
-      "name": "M6 \u2014 match check (masked)",
-      "family": "M: match checks (masked)",
-      "mean_abs_shap": 0.09669183164322045
+      "feature": "D4",
+      "name": "D4 \u2014 days since an earlier event (masked)",
+      "family": "D: time deltas (masked)",
+      "mean_abs_shap": 0.09389090040925957
     },
     {
       "feature": "C2",
       "name": "C2 \u2014 count of linked entities (masked)",
       "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.0965442261302509
+      "mean_abs_shap": 0.08746944192801626
     },
     {
-      "feature": "C11",
-      "name": "C11 \u2014 count of linked entities (masked)",
-      "family": "C: linked-entity counts (masked)",
-      "mean_abs_shap": 0.09488048137159612
+      "feature": "M6",
+      "name": "M6 \u2014 match check (masked)",
+      "family": "M: match checks (masked)",
+      "mean_abs_shap": 0.08713391103561864
     }
   ],
   "shap_explainable_top20": [
     {
+      "feature": "card_known_fraud_rate",
+      "name": "Share of the card's labelled transactions that were fraud",
+      "mean_abs_shap": 1.0287851167241495
+    },
+    {
       "feature": "amt_cents",
       "name": "Cents part of the amount",
-      "mean_abs_shap": 0.5066634135853644
+      "mean_abs_shap": 0.43154959401501347
+    },
+    {
+      "feature": "TransactionAmt",
+      "name": "Amount (USD)",
+      "mean_abs_shap": 0.27197808218750436
     },
     {
       "feature": "P_emaildomain",
       "name": "Purchaser email domain",
-      "mean_abs_shap": 0.3228340904103814
-    },
-    {
-      "feature": "TransactionAmt",
-      "name": "Amount (USD)",
-      "mean_abs_shap": 0.29576135554426825
-    },
-    {
-      "feature": "card1",
-      "name": "Card issuer code",
-      "mean_abs_shap": 0.220584086898594
-    },
-    {
-      "feature": "R_emaildomain",
-      "name": "Recipient email domain",
-      "mean_abs_shap": 0.2200152538528488
-    },
-    {
-      "feature": "dist1",
-      "name": "Distance 1",
-      "mean_abs_shap": 0.20488676225495825
+      "mean_abs_shap": 0.232499577349269
     },
     {
       "feature": "card_secs_since_prev",
       "name": "Time since the card's last transaction",
-      "mean_abs_shap": 0.20488366596063415
+      "mean_abs_shap": 0.22665434040860505
     },
     {
       "feature": "card2",
       "name": "Card code 2",
-      "mean_abs_shap": 0.20439124319282367
+      "mean_abs_shap": 0.1743549679969479
+    },
+    {
+      "feature": "R_emaildomain",
+      "name": "Recipient email domain",
+      "mean_abs_shap": 0.1682001441614523
+    },
+    {
+      "feature": "card6",
+      "name": "Card type",
+      "mean_abs_shap": 0.16307524087056974
+    },
+    {
+      "feature": "card_known_labelled",
+      "name": "Card transactions old enough to have a label",
+      "mean_abs_shap": 0.1540708481102679
     },
     {
       "feature": "addr1",
       "name": "Billing region",
-      "mean_abs_shap": 0.19257563946654005
-    },
-    {
-      "feature": "card6",
-      "name": "Card type",
-      "mean_abs_shap": 0.18242815652392244
-    },
-    {
-      "feature": "card_txn_prior",
-      "name": "Card's transaction history length",
-      "mean_abs_shap": 0.15206504545683983
-    },
-    {
-      "feature": "email_txn_7d",
-      "name": "How common this email domain is lately",
-      "mean_abs_shap": 0.13157001472208385
-    },
-    {
-      "feature": "ProductCD",
-      "name": "Product code",
-      "mean_abs_shap": 0.11625943263726474
-    },
-    {
-      "feature": "hour",
-      "name": "Hour of day",
-      "mean_abs_shap": 0.10746866943204675
-    },
-    {
-      "feature": "card_amt_7d",
-      "name": "Card spend, last 7 days",
-      "mean_abs_shap": 0.10696719685988734
-    },
-    {
-      "feature": "card5",
-      "name": "Card code 5",
-      "mean_abs_shap": 0.10206940668280765
-    },
-    {
-      "feature": "card_txn_7d",
-      "name": "Card transactions, last 7 days",
-      "mean_abs_shap": 0.09445238512403062
-    },
-    {
-      "feature": "card_amt_zscore",
-      "name": "Amount unusual for this card",
-      "mean_abs_shap": 0.08592868238679116
-    },
-    {
-      "feature": "card_amt_ratio",
-      "name": "Amount vs the card's usual spend",
-      "mean_abs_shap": 0.08394377828732726
-    },
-    {
-      "feature": "card3",
-      "name": "Card country code",
-      "mean_abs_shap": 0.08278535631641089
-    }
-  ],
-  "shap_share_by_family": {
-    "V: Vesta signals (masked)": 0.27445549372351036,
-    "readable transaction fields": 0.2628663802637708,
-    "C: linked-entity counts (masked)": 0.16738341554961123,
-    "D: time deltas (masked)": 0.11842784225184484,
-    "identity and device fields (masked)": 0.0670842196886157,
-    "history aggregates (this project)": 0.05735860127643078,
-    "M: match checks (masked)": 0.05242404724621626
-  },
-  "alerts": 4089,
-  "top_reason_family_share": {
-    "C: linked-entity counts (masked)": 0.4441183663487405,
-    "readable transaction fields": 0.3665932990951333,
-    "V: Vesta signals (masked)": 0.15798483736854976,
-    "identity and device fields (masked)": 0.022743947175348497,
-    "D: time deltas (masked)": 0.006847640009782343,
-    "history aggregates (this project)": 0.0009782342871117633,
-    "M: match checks (masked)": 0.0007336757153338225
-  },
-  "top_reason_feature_share": [
-    {
-      "feature": "TransactionAmt",
-      "name": "Amount (USD)",
-      "share": 0.2379554903399364
-    },
-    {
-      "feature": "C13",
-      "name": "C13 \u2014 count of linked entities (masked)",
-      "share": 0.18317437026167768
-    },
-    {
-      "feature": "C1",
-      "name": "C1 \u2014 count of linked entities (masked)",
-      "share": 0.14184397163120568
-    },
-    {
-      "feature": "V258",
-      "name": "V258 \u2014 Vesta risk signal (masked)",
-      "share": 0.1210564930300807
-    },
-    {
-      "feature": "C14",
-      "name": "C14 \u2014 count of linked entities (masked)",
-      "share": 0.09708975299584251
-    },
-    {
-      "feature": "card6",
-      "name": "Card type",
-      "share": 0.0677427243824896
+      "mean_abs_shap": 0.15161120840905645
     },
     {
       "feature": "card1",
       "name": "Card issuer code",
-      "share": 0.018586451455123502
+      "mean_abs_shap": 0.1443949906767463
     },
     {
-      "feature": "id_31",
-      "name": "Browser",
-      "share": 0.01173881144534116
+      "feature": "dist1",
+      "name": "Distance 1",
+      "mean_abs_shap": 0.14321779102600415
     },
     {
-      "feature": "V281",
-      "name": "V281 \u2014 Vesta risk signal (masked)",
-      "share": 0.010026901442895574
+      "feature": "email_txn_7d",
+      "name": "How common this email domain is lately",
+      "mean_abs_shap": 0.1318865718668652
     },
     {
-      "feature": "card4",
-      "name": "Card network",
-      "share": 0.009293225727561751
+      "feature": "hour",
+      "name": "Hour of day",
+      "mean_abs_shap": 0.10804976357483817
+    },
+    {
+      "feature": "card5",
+      "name": "Card code 5",
+      "mean_abs_shap": 0.0940831211386301
+    },
+    {
+      "feature": "card3",
+      "name": "Card country code",
+      "mean_abs_shap": 0.09247258893171216
+    },
+    {
+      "feature": "card_amt_7d",
+      "name": "Card spend, last 7 days",
+      "mean_abs_shap": 0.09098802741220731
+    },
+    {
+      "feature": "ProductCD",
+      "name": "Product code",
+      "mean_abs_shap": 0.07964011007582392
+    },
+    {
+      "feature": "email_match",
+      "name": "Purchaser and recipient domains match",
+      "mean_abs_shap": 0.07367536297947046
+    },
+    {
+      "feature": "device_cards_7d",
+      "name": "Cards seen on this device, last 7 days",
+      "mean_abs_shap": 0.07148372175438535
+    }
+  ],
+  "shap_share_by_family": {
+    "V: Vesta signals (masked)": 0.24376737003306467,
+    "readable transaction fields": 0.2177366127258739,
+    "history aggregates (this project)": 0.1922730442403584,
+    "C: linked-entity counts (masked)": 0.1379971618361481,
+    "D: time deltas (masked)": 0.10637009475176641,
+    "identity and device fields (masked)": 0.057510227094387266,
+    "M: match checks (masked)": 0.044345489318401224
+  },
+  "alerts": 4102,
+  "top_reason_family_share": {
+    "C: linked-entity counts (masked)": 0.37835202340321794,
+    "readable transaction fields": 0.26621160409556316,
+    "history aggregates (this project)": 0.1955143832276938,
+    "V: Vesta signals (masked)": 0.12164797659678206,
+    "D: time deltas (masked)": 0.019746465138956608,
+    "identity and device fields (masked)": 0.018283764017552412,
+    "M: match checks (masked)": 0.00024378352023403217
+  },
+  "top_reason_feature_share": [
+    {
+      "feature": "C14",
+      "name": "C14 \u2014 count of linked entities (masked)",
+      "share": 0.22330570453437348
+    },
+    {
+      "feature": "TransactionAmt",
+      "name": "Amount (USD)",
+      "share": 0.22038030229156508
+    },
+    {
+      "feature": "card_known_fraud_rate",
+      "name": "Share of the card's labelled transactions that were fraud",
+      "share": 0.19356411506582155
+    },
+    {
+      "feature": "C1",
+      "name": "C1 \u2014 count of linked entities (masked)",
+      "share": 0.11140906874695271
+    },
+    {
+      "feature": "V258",
+      "name": "V258 \u2014 Vesta risk signal (masked)",
+      "share": 0.07971721111652852
+    },
+    {
+      "feature": "C13",
+      "name": "C13 \u2014 count of linked entities (masked)",
+      "share": 0.03388590931253047
+    },
+    {
+      "feature": "card6",
+      "name": "Card type",
+      "share": 0.025597269624573378
+    },
+    {
+      "feature": "D2",
+      "name": "D2 \u2014 days since an earlier event (masked)",
+      "share": 0.018283764017552412
+    },
+    {
+      "feature": "C4",
+      "name": "C4 \u2014 count of linked entities (masked)",
+      "share": 0.008288639687957094
+    },
+    {
+      "feature": "V45",
+      "name": "V45 \u2014 Vesta risk signal (masked)",
+      "share": 0.008044856167723062
     }
   ],
   "explainable_params": {
@@ -648,10 +648,10 @@
     "deterministic": true,
     "force_row_wise": true,
     "num_leaves": 63,
-    "min_child_samples": 50,
+    "min_child_samples": 200,
     "scale_pos_weight": 1.0
   },
-  "explainable_trees": 1553,
-  "explainable_calibration": "platt",
-  "explainable_valid_pr_auc": 0.3545432589026461
+  "explainable_trees": 909,
+  "explainable_calibration": "none",
+  "explainable_valid_pr_auc": 0.517880052689965
 }

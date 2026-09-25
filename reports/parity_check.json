@@ -1,7 +1,7 @@
 {
   "rows_compared": 590540,
-  "features_compared": 24,
-  "values_compared": 14172960,
+  "features_compared": 27,
+  "values_compared": 15944580,
   "mismatches": 0,
   "mismatches_by_feature": {},
   "splits": [
@@ -10,8 +10,8 @@
     "valid"
   ],
   "events_replayed": 590540,
-  "online_seconds": 5.3,
-  "online_events_per_second": 112478,
+  "online_seconds": 6.8,
+  "online_events_per_second": 87060,
   "online_keys": {
     "card_key": 217850,
     "device_key": 9500,
