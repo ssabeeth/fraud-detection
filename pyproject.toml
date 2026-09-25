@@ -50,6 +50,10 @@ monitor = [
 kaggle = [
     "kaggle>=1.6",
 ]
+compare = [
+    "catboost>=1.2",
+    "xgboost>=2.1",
+]
 
 [project.scripts]
 fraud = "fraud.cli:main"
