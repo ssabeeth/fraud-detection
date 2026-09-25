@@ -694,3 +694,41 @@ are unchanged. Month to month, LightGBM's own PR-AUC moves between
 0.523 and 0.556, which is the size of difference that one month
 cannot resolve.
 
+## 2026-09-25 — Pre-registered: the experiment programme and the rule for adopting a change
+
+Written and committed before any of these experiments was run.
+
+**Where.** The same three expanding-window folds as the model comparison (score
+February, March and April once each; early stopping and calibration on the last 14 days
+of each training window). May is not read. LightGBM with the comparison's chosen setting
+(63 leaves, 200 minimum samples per leaf, learning rate 0.1) for every experiment, so
+only the thing under test changes.
+
+**What.** Each experiment answers a question raised by a pattern in the training months
+(`reports/data_patterns.md`, generated from December to April only):
+
+1. Without the 17 point-in-time aggregates (what the feature engineering is worth).
+2. Without the 339 V columns (what the masked columns are worth).
+3. With the D columns normalised to dates (day minus Dn), because raw D columns grow with
+   time.
+4. With per-card means of earlier C and normalised D values, because fraud labels cover
+   whole clients.
+5. With the card's delayed-label history: chargebacks on earlier transactions whose
+   labels had arrived (30 days) before this one.
+6. With 3 to 5 together.
+7. Without the features adversarial validation finds most time-dependent.
+8. Trained on the latest 60 days only rather than every earlier month (drift).
+9. With the positive class weighted five times (imbalance).
+
+**How they are judged.** Against the current feature set in the same folds, by PR-AUC
+and by the money of the untuned expected-loss policy. For money, a 95% interval for the
+difference comes from resampling days within each scored month (1,000 draws, days kept
+whole because the review queue is per day).
+
+**Adoption rule.** A change is adopted only if it is cheaper in all three months **and**
+the 95% interval of the pooled saving excludes zero. An adopted feature is then built
+properly (Spark and stream implementations, point-in-time and parity tests), the model
+is retrained and tuned on April by the usual pipeline, the policy re-frozen on April,
+and May scored once more as a new, logged result. Anything else is reported and not
+adopted.
+
