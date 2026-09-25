@@ -601,7 +601,7 @@ request from zero, 28 ms inside the API after).
 
 ## 2026-09-25 — Databricks: what the first real run changed
 
-Four problems appeared only on the workspace, each fixed in code with a test where one
+Five problems appeared only on the workspace, each fixed in code with a test where one
 fits:
 
 1. **Development mode renamed the schema** to `dev_<user>_fraud`, while the job's volume
@@ -625,6 +625,13 @@ fits:
    recompute 4,495 rows. **Decision:** group only the keys the sample needs, each with
    its full history, so the check is as independent as before and gives the same
    result; each stage now logs its time. It then took 13.2 minutes on serverless.
+5. **Unity Catalog volumes cannot append to a file.** Training finished and registered
+   the model, then failed saving it ("Illegal seek"): LightGBM's `save_model` appends the
+   category levels after writing the trees, and the test-read log was appended to.
+   **Decision:** write each file in one go (`model_to_string`, the same text; the log is
+   rewritten whole); a test fails any save that opens a file for appending. Serverless
+   had also retried the failed task by itself with the old wheel, so the retry was
+   cancelled before the repair.
 
 The job's evaluate and policy tasks read the test month again. That is a reproduction of
 the reported run, not a new result, so `--test-note` labels those reads in the workspace's
@@ -645,3 +652,15 @@ review queue against capacity) and the sensitivity table, drawn as inline SVG wi
 values, no JavaScript and no external files, in light and dark themes. Streamlit would
 need a running server and the owner's Streamlit account for a page that never changes.
 `docs/tableau.md` is removed; the CSV stays, for any BI tool.
+
+## 2026-09-25 — Result: Databricks reproduces the local run
+
+On the owner's Free Edition workspace, serverless environment 6, the job gives identical
+data counts in every split, the same 217,850 card keys, a point-in-time check with no
+differences, the same LightGBM PR-AUC (0.6156 validation, 0.5474 test) and the same money
+for the chosen policy ($278,535 and 59.8% of fraud value on May) and the rules
+($474,219). Only the logistic regression moves, by 0.2% ($472,921 against $472,022),
+because scikit-learn is 1.7.2 there and 1.9.1 locally. The two test-month reads the job
+made are logged in the workspace as a reproduction, so the count of reported test results
+is unchanged. The full table is in `docs/databricks.md`.
+
