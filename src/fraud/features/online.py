@@ -12,6 +12,11 @@ event-time order. For each entity key the state holds:
 
 The running statistics use the same update formulas as Spark's ``avg`` and
 ``stddev_samp``, in the same order, so the two implementations agree to rounding.
+
+Labels reach the state through ``observe_label``, called when a label arrives (in the
+stream, from the labels topic, before any later transaction). The card's count of known
+frauds is the number of fraud labels observed; its count of labelled transactions needs
+no label at all, since every transaction more than ``LABEL_DELAY`` old has one.
 """
 
 from __future__ import annotations
@@ -21,7 +26,14 @@ from bisect import bisect_left
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 
-from fraud.features.definitions import AGGREGATES, ENTITIES, STD_EPSILON, Aggregate
+from fraud.features.definitions import (
+    AGGREGATES,
+    ENTITIES,
+    LABEL_DELAY,
+    LABEL_KINDS,
+    STD_EPSILON,
+    Aggregate,
+)
 from fraud.features.keys import SECONDS_PER_DAY, card_key, device_key, email_key
 
 _AMOUNT = "TransactionAmt"
@@ -66,6 +78,7 @@ class _KeyState:
     w_m2: float = 0.0
     last_time: int | None = None
     seen: dict[str, set] = field(default_factory=dict)
+    known_frauds: int = 0  # fraud labels observed for this key
     # same-second events not yet visible
     pending: list[tuple[int, float, dict]] = field(default_factory=list)
 
@@ -76,8 +89,17 @@ class OnlineFeatures:
     def __init__(self, aggregates: Iterable[Aggregate] = AGGREGATES) -> None:
         self.aggregates = list(aggregates)
         self._by_entity = {e: [a for a in self.aggregates if a.entity == e] for e in ENTITIES}
+        label_entities = {a.entity for a in self.aggregates if a.kind in LABEL_KINDS}
+        if not label_entities <= {"card_key"}:
+            raise ValueError("label aggregates are defined for the card key only")
         self._max_window = {
-            e: max((a.window or 0 for a in aggs if a.window is not None), default=0)
+            e: max(
+                [
+                    *(a.window for a in aggs if a.window is not None),
+                    *([LABEL_DELAY] if e in label_entities else []),
+                ],
+                default=0,
+            )
             for e, aggs in self._by_entity.items()
         }
         self._columns = {
@@ -141,6 +163,14 @@ class OnlineFeatures:
             if v is None:
                 return None
             return 0 if v in st.seen.get(a.column, ()) else 1
+        if a.kind in LABEL_KINDS:
+            # committed transactions older than the delay: all of them minus the recent ones
+            labelled = st.n - (len(st.times) - bisect_left(st.times, t - LABEL_DELAY))
+            if a.kind == "known_labelled":
+                return labelled
+            if a.kind == "known_frauds":
+                return st.known_frauds
+            return st.known_frauds / labelled if labelled else None
         raise ValueError(a.kind)  # pragma: no cover
 
     # -- public API ----------------------------------------------------------------------
@@ -176,6 +206,15 @@ class OnlineFeatures:
             st.pending.append((t, amt, vals))
         out.update(local_features(event))
         return out
+
+    def observe_label(self, label: dict) -> None:
+        """A label has arrived for an earlier transaction (its card fields, time and
+        ``isFraud``). Only frauds change the state."""
+        if not int(label.get("isFraud") or 0):
+            return
+        key = card_key(label.get("card1"), label.get("addr1"), label[_TIME], label.get("D1"))
+        if key is not None:
+            self._state["card_key"].setdefault(key, _KeyState()).known_frauds += 1
 
     def state_size(self) -> dict[str, int]:
         return {e: len(s) for e, s in self._state.items()}

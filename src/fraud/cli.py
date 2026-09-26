@@ -167,6 +167,30 @@ def _cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_experiments(args: argparse.Namespace) -> int:
+    from fraud.model.experiments import run
+    from fraud.spark import get_spark
+
+    if args.report_only:
+        from fraud.model.experiments_report import write_report
+
+        out = reports_dir()
+        print(write_report(json.loads((out / "experiments.json").read_text()), out))
+        return 0
+    result = run(get_spark("experiments"), settings(), names=args.only)
+    print(json.dumps({e["name"]: e["adopted"] for e in result["experiments"]}))
+    return 0
+
+
+def _cmd_patterns(_: argparse.Namespace) -> int:
+    from fraud.model.patterns import run
+    from fraud.spark import get_spark
+
+    result = run(get_spark("patterns"), settings())
+    print(json.dumps({"adversarial_auc": round(result["adversarial"]["auc"], 3)}))
+    return 0
+
+
 def _cmd_dashboard(args: argparse.Namespace) -> int:
     from fraud.policy.dashboard import build
 
@@ -283,6 +307,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--report-only", action="store_true", help="re-render the report from the saved results"
     )
     p.set_defaults(func=_cmd_compare)
+
+    p = sub.add_parser("patterns", help="data patterns in December to April (no test month)")
+    p.set_defaults(func=_cmd_patterns)
+
+    p = sub.add_parser("experiments", help="the pre-registered experiments (no test month)")
+    p.add_argument("--only", nargs="+", help="run only these experiments (plus the baseline)")
+    p.add_argument(
+        "--report-only", action="store_true", help="re-render the report from the saved results"
+    )
+    p.set_defaults(func=_cmd_experiments)
 
     p = sub.add_parser("dashboard", help="write site/index.html from the export and the report")
     p.add_argument("--out", type=Path, default=None, help="default: site/index.html")

@@ -5,7 +5,14 @@ import math
 import pytest
 
 from fraud.features.catalogue import render
-from fraud.features.definitions import AGGREGATE_NAMES, AGGREGATES, DAY, HOUR, LOCAL_NAMES
+from fraud.features.definitions import (
+    AGGREGATE_NAMES,
+    AGGREGATES,
+    DAY,
+    HOUR,
+    LABEL_DELAY,
+    LOCAL_NAMES,
+)
 from fraud.features.offline import add_features
 from fraud.features.online import OnlineFeatures
 from fraud.features.pit import check
@@ -115,19 +122,48 @@ def test_point_in_time_canary_catches_a_leaky_window(spark, lake):
     diffs = check(spark, lake, features=leaky)
     leaked = {name for _, name, _, _ in diffs}
     assert "card_txn_1h" in leaked and "card_amt_24h" in leaked
+    assert "card_known_chargebacks" in leaked and "card_known_labelled" in leaked
 
 
 @pytest.mark.spark
 def test_online_features_equal_offline_on_every_fixture_row(spark, lake, features):
+    from fraud.features.parity import TX, with_labels
+
     offline = features.orderBy("TransactionDT", "TransactionID").toPandas()
     online = OnlineFeatures()
+    outputs = []
+    for kind, payload in with_labels(offline):
+        if kind == TX:
+            outputs.append(online.process(payload))
+        else:
+            online.observe_label(payload)
     mismatches = []
-    for row in offline.to_dict("records"):
-        got = online.process(row)
+    for row, got in zip(offline.to_dict("records"), outputs, strict=True):
         for name in [*AGGREGATE_NAMES, "amt_cents", "hour", "weekday", "email_match"]:
             if not _close(row[name], got[name], rel_tol=1e-9):
                 mismatches.append((row["TransactionID"], name, row[name], got[name]))
     assert mismatches == [], mismatches[:10]
+    # the fixtures exercise the label features, not just their zeros
+    assert (offline["card_known_chargebacks"] > 0).sum() > 0
+
+
+def test_a_label_counts_only_after_it_has_arrived():
+    online = OnlineFeatures()
+    t0 = 10 * DAY
+    online.process(_event(t0) | {"TransactionID": 1})
+    label = {"TransactionDT": t0, "isFraud": 1, "card1": 1000, "addr1": 100.0, "D1": 10.0}
+    # the label is released at t0 + delay; a transaction in that second does not see it
+    at_release = online.process(_event(t0 + LABEL_DELAY) | {"TransactionID": 2})
+    assert at_release["card_known_labelled"] == 0 and at_release["card_known_chargebacks"] == 0
+    assert at_release["card_known_fraud_rate"] is None
+    online.observe_label(label)
+    after = online.process(_event(t0 + LABEL_DELAY + 1) | {"TransactionID": 3})
+    assert after["card_known_labelled"] == 1 and after["card_known_chargebacks"] == 1
+    assert after["card_known_fraud_rate"] == 1.0
+    online.observe_label(label | {"isFraud": 0, "TransactionDT": t0 + LABEL_DELAY})
+    later = online.process(_event(t0 + 2 * LABEL_DELAY + 2) | {"TransactionID": 4})
+    assert later["card_known_labelled"] == 3 and later["card_known_chargebacks"] == 1
+    assert later["card_known_fraud_rate"] == pytest.approx(1 / 3)
 
 
 def test_parity_compare_reports_a_changed_value():

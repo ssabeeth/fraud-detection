@@ -87,17 +87,37 @@ def outage_scenario(
     end: date,
     outage_from: date,
 ):
-    """Replay the window in-process with identity fields blanked from ``outage_from``."""
+    """Replay the window in-process with identity fields blanked from ``outage_from``.
+
+    Labels arrive as in the stream: each ``LABEL_DELAY`` after its transaction, applied
+    before every later transaction (only frauds change the feature state)."""
+    from fraud.features.definitions import LABEL_DELAY
     from fraud.features.parity import EVENT_FIELDS
     from fraud.stream.messages import records, silver_between
 
     lo, hi, cut = s.to_seconds(start), s.to_seconds(end), s.to_seconds(outage_from)
-    history = silver_between(spark, s, 0, lo, with_label=False)[EVENT_FIELDS]
+    history = silver_between(spark, s, 0, lo)[[*EVENT_FIELDS, "isFraud"]]
     window = silver_between(spark, s, lo, hi)
     scorer = OnlineScorer(bundle, frozen)
-    scorer.warm(records(history, EVENT_FIELDS))
+    scorer.warm(records(history, [*EVENT_FIELDS, "isFraud"]), labels_before=lo)
+    due = pd.concat([history, window])
+    due = due[(due["isFraud"] == 1) & (due["TransactionDT"] + LABEL_DELAY >= lo)]
+    due = due.assign(released=due["TransactionDT"] + LABEL_DELAY).sort_values(
+        ["released", "TransactionID"], kind="stable"
+    )
+    pending = list(
+        zip(
+            due["released"],
+            records(due, ["TransactionDT", "isFraud", "card1", "addr1", "D1"]),
+            strict=True,
+        )
+    )
+    applied = 0
     rows = []
     for event, fraud in zip(records(window), window["isFraud"], strict=True):
+        while applied < len(pending) and pending[applied][0] < event["TransactionDT"]:
+            scorer.observe_label(pending[applied][1])
+            applied += 1
         if event["TransactionDT"] >= cut:
             event = {**event, **dict.fromkeys(IDENTITY_FIELDS), "has_identity": False}
         d = scorer.decide(event)
@@ -122,6 +142,22 @@ def outage_scenario(
         }
     )
     return decisions, labels
+
+
+def _before_outage(scenarios: dict, cut: int) -> dict:
+    """Up to the outage the in-process replay must decide exactly as the stream did."""
+    stream = scenarios["replay"][0].set_index("TransactionID")
+    stress = scenarios["identity_outage"][0].set_index("TransactionID")
+    ids = stress.index[stress["TransactionDT"] < cut]
+    a, b = stream.loc[ids], stress.loc[ids]
+    out = {
+        "transactions": len(ids),
+        "actions_equal": int((a["action"] == b["action"]).sum()),
+        "max_p_fraud_difference": float((a["p_fraud"] - b["p_fraud"]).abs().max()),
+    }
+    if out["actions_equal"] != out["transactions"] or out["max_p_fraud_difference"] > 1e-9:
+        raise RuntimeError(f"stress replay differs from the stream before the outage: {out}")
+    return out
 
 
 def run(
@@ -149,6 +185,7 @@ def run(
             spark, s, bundle, frozen, start, s.split.test.end, outage_from
         ),
     }
+    results["before_outage"] = _before_outage(scenarios, s.to_seconds(outage_from))
     evidently_dir = s.path("monitoring")
     evidently_dir.mkdir(parents=True, exist_ok=True)
     for name, (decisions, labels) in scenarios.items():

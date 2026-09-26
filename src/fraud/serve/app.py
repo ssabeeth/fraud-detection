@@ -29,6 +29,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from fraud import __version__
 from fraud.config import REPO_ROOT
+from fraud.features.definitions import LABEL_DELAY
 from fraud.features.online import OnlineFeatures
 from fraud.model.bundle import ModelBundle
 from fraud.policy.costs import ACTION_NAMES, APPROVE, DECLINE, REVIEW
@@ -62,6 +63,14 @@ class Transaction(BaseModel):
     addr1: float | None = None
     D1: float | None = None
     P_emaildomain: str | None = None
+    isFraud: int | None = Field(
+        None,
+        ge=0,
+        le=1,
+        description="history only: the label, if known. It counts only when the transaction "
+        "is more than 30 days before the one being scored (the chargeback delay); a label on "
+        "the scored transaction itself is ignored.",
+    )
 
 
 class ScoreRequest(BaseModel):
@@ -132,9 +141,14 @@ def score(req: ScoreRequest) -> ScoreResponse:
         REQUESTS.labels("rejected").inc()
         raise HTTPException(422, "history contains transactions after the one being scored")
     online = OnlineFeatures()
-    for h in sorted(req.history, key=lambda h: (h.TransactionDT, h.TransactionID)):
+    history = sorted(req.history, key=lambda h: (h.TransactionDT, h.TransactionID))
+    for h in history:
         online.process(_event(h))
+    for h in history:  # labels that had arrived by the time of the scored transaction
+        if h.isFraud is not None and h.TransactionDT + LABEL_DELAY < tx.TransactionDT:
+            online.observe_label(_event(h))
     event = _event(tx)
+    event.pop("isFraud", None)
     feats = online.process(event)
     p, reasons = state.bundle.score_one({**event, **feats})
     costs = state.policy.costs

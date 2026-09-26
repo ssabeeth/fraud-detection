@@ -2,7 +2,9 @@
 
 Every window has an exclusive upper bound: ``rangeBetween(-W, -1)`` on the integer
 ``TransactionDT`` keeps rows with ``t - W <= t_e <= t - 1``, which is exactly
-``t - W <= t_e < t``. All-history aggregates use ``rangeBetween(unboundedPreceding, -1)``.
+``t - W <= t_e < t``. All-history aggregates use ``rangeBetween(unboundedPreceding, -1)``,
+and the label aggregates ``rangeBetween(unboundedPreceding, -LABEL_DELAY - 1)``: only
+transactions whose label had arrived before ``t``.
 A range frame (not a row frame) is what makes same-second transactions invisible to
 each other, whatever their order in the partition.
 """
@@ -15,8 +17,14 @@ from pyspark.sql import Column, DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
 from fraud.config import Settings
-from fraud.features.definitions import AGGREGATES, STD_EPSILON, Aggregate
-from fraud.lakehouse.schema import AMOUNT, KEY, TIME
+from fraud.features.definitions import (
+    AGGREGATES,
+    LABEL_DELAY,
+    LABEL_KINDS,
+    STD_EPSILON,
+    Aggregate,
+)
+from fraud.lakehouse.schema import AMOUNT, KEY, LABEL, TIME
 from fraud.lakehouse.tables import GOLD_FEATURES, GOLD_TRANSACTIONS, table_path
 
 log = logging.getLogger(__name__)
@@ -67,6 +75,20 @@ def aggregate_col(a: Aggregate, *, leaky: bool = False) -> Column:
         seen = F.collect_set(a.column).over(w)
         new = F.when(F.array_contains(seen, F.col(a.column)), 0).otherwise(1)
         expr = F.when(F.col(a.column).isNotNull(), new)
+    elif a.kind in LABEL_KINDS:
+        # Labels that had arrived: transactions at least LABEL_DELAY + 1 seconds earlier.
+        known = (
+            Window.partitionBy(_partition(a.entity))
+            .orderBy(TIME)
+            .rangeBetween(Window.unboundedPreceding, 0 if leaky else -LABEL_DELAY - 1)
+        )
+        frauds = F.coalesce(F.sum(F.col(LABEL)).over(known), F.lit(0))
+        labelled = F.count(F.lit(1)).over(known)
+        expr = {
+            "known_frauds": frauds,
+            "known_labelled": labelled,
+            "known_fraud_rate": F.when(labelled > 0, frauds / labelled),
+        }[a.kind]
     else:  # pragma: no cover - guarded by the Literal type
         raise ValueError(a.kind)
     # A missing entity key means no history can be attributed: the feature is unknown.

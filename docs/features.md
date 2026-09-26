@@ -6,10 +6,13 @@ this file is out of date. Amounts are USD.
 **Point-in-time rule.** Every aggregate for a transaction at time `t` uses only
 transactions of the same entity with event time strictly before `t`; a window of `W`
 keeps those with `t - W <= t_e < t`. Transactions in the same second are not visible to
-each other. No feature uses a label. The offline (Spark) and online (stream) code both
-implement this list, and three tests hold them to it: the point-in-time test against a
-naive recomputation from raw history, a canary that must fail when the window includes
-the current row, and the online/offline parity test.
+each other. The three `card_known_*` features use fraud labels, and only labels that had
+arrived: a label arrives 30 days after its transaction (the chargeback delay), so they
+count transactions with `t_e < t - 30 days`, and never see the current transaction's own
+label. The offline (Spark) and online (stream) code both implement this list, and three
+tests hold them to it: the point-in-time test against a naive recomputation from raw
+history, a canary that must fail when a window includes the current row, and the
+online/offline parity test, which releases each label 30 days after its transaction.
 
 **Entities.** `card_key` is the pseudo-card (`card1` + `addr1` + first-seen day, see
 `reports/data.md` for how stable it is); `device_key` is a coarse device fingerprint
@@ -37,6 +40,9 @@ without an identity record; `email_key` is the purchaser's email domain.
 | `device_txn_24h` | Device transactions, last 24 hours | `device_key` | 24 hours | Number of transactions by this device in the previous 24 hours. |
 | `device_cards_7d` | Cards seen on this device, last 7 days | `device_key` | 7 days | Distinct cards used by this device in the previous 7 days. |
 | `email_txn_7d` | How common this email domain is lately | `email_key` | 7 days | Number of transactions by this email domain in the previous 7 days. |
+| `card_known_chargebacks` | Chargebacks already reported on this card | `card_key` | all prior history | Earlier transactions by this card labelled fraud, counting only labels that had arrived (30 days after their transaction). |
+| `card_known_labelled` | Card transactions old enough to have a label | `card_key` | all prior history | Earlier transactions by this card old enough for their label to have arrived (more than 30 days before). |
+| `card_known_fraud_rate` | Share of the card's labelled transactions that were fraud | `card_key` | all prior history | Share of this card's transactions with an arrived label that were fraud (null if none). |
 
 ## Transaction fields
 

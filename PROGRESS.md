@@ -7,6 +7,28 @@ comparison with XGBoost and CatBoost (never reading May) backs LightGBM:
 `reports/model_comparison.md`.
 Every result is from the real data and is in `reports/`; the headline is in the README.
 
+## Phase 4b — Experiments and the card's chargeback history (2026-09-25)
+
+Branch `phase-4b-experiments`, merged as `v0.13-experiments`.
+
+- `reports/data_patterns.md` (`fraud patterns`, December to April only) and the
+  pre-registered experiments `reports/experiments.md` (`fraud experiments`, February to
+  April, May never read). Only the card's chargeback history known after the 30-day
+  delay passes the rule: +$49k a month (95% interval +$40k to +$59k); a block list
+  captures about 70% of that and the model adds a further $43k over three months.
+- The three `card_known_*` features built in Spark, online, the naive reference, parity,
+  the stream (labels topic, `_labels_before` barrier) and the API.
+- Features rebuilt (point-in-time 89,900 values and parity 15.9M values, 0 differences);
+  retrained and May scored once more ($231,926, 66.7% caught, 51% below the rules; 11
+  logged test reads); explainability, cards and dashboard regenerated; Databricks rerun
+  from `features` reproduces the new headline.
+- Two bugs found by the checks and fixed (DECISIONS.md): the stream applied labels
+  early (stream parity then 0 mismatches at both speeds, every action equal), and the
+  monitor's stress replay never applied them (it now must match the stream before the
+  outage, 63,188 of 63,188).
+- Latency: 258 decisions a second at 3.8 ms median; paced at 1,800×, 12.4 ms end to end
+  (p99 29 ms). Monitoring: the week of 8 May trips the retrain rule on 14 June.
+
 ## Stopped for the owner: exact situation and next steps
 
 1. ~~**Create the GitHub repository and push.**~~ Done 2026-09-24: `main` and tags
@@ -27,7 +49,7 @@ Every result is from the real data and is in `reports/`; the headline is in the 
    views are a static page, `site/index.html`, published by `.github/workflows/pages.yml`
    to <https://ssabeeth.github.io/fraud-detection/>. GitHub Pages must be switched on once, with "GitHub Actions"
    as the source.
-6. Tag `v1.0`.
+6. ~~Tag `v1.0`.~~ Done 2026-09-25.
 
 **Local machine state.** Installed with Homebrew: `openjdk@17`, `terraform` 1.16.4,
 the Databricks CLI (v1.17.0); Colima and Docker were already there (Colima is stopped
@@ -49,10 +71,11 @@ deleted after bronze. Kaggle credentials are in `~/.kaggle/credentials.json` fro
 | 6. Explainability and governance | done | `v0.6-explainability` |
 | 7. Streaming | done | `v0.7-streaming` |
 | 8. Serving and monitoring | done | `v0.8` |
-| 9. Databricks | ready; needs the owner's workspace login to deploy | `v0.9-databricks-ready` |
-| 10. Cloud slice with Terraform | ready; needs the owner's Azure login to apply | `v0.10-azure-ready` |
-| 11. Business dashboard | export and guide done; the owner builds and publishes | `v0.11-dashboard` |
-| 12. README | done (`v1.0` waits for 9-11's owner steps) | `v0.12-readme` |
+| 9. Databricks | done; run on the owner's workspace, reproduces the local headline | `v0.9-databricks-ready` |
+| 10. Cloud slice with Terraform | done; applied, API live on Azure Container Apps | `v0.10-azure-ready` |
+| 11. Business dashboard | done; static page on GitHub Pages instead of Tableau | `v0.11-dashboard` |
+| 12. README | done | `v0.12-readme` |
+| 4b. Model comparison, data patterns, experiments, chargeback history | done | `v0.13-experiments`, `v1.0` |
 
 ## Log
 

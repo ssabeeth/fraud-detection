@@ -10,7 +10,13 @@ transactions of the same entity with event time ``t_e < t`` (strictly before), a
 window of ``W`` seconds keeps those with ``t - W <= t_e``. Transactions in the same
 second as the current one are not visible to it, whatever order they arrive in: the
 stream cannot know which of two same-second events "came first", and the offline job
-must not either. No feature uses a label.
+must not either.
+
+**Labels.** Three card features use fraud labels, and only labels that had arrived. A
+label arrives ``LABEL_DELAY`` after its transaction (the chargeback delay in
+``configs/base.yaml``), so a transaction at ``t`` sees the label of an earlier one at
+``t_e`` only if ``t_e < t - LABEL_DELAY``: the same strict rule, shifted by the delay. No
+feature ever sees its own transaction's label.
 """
 
 from __future__ import annotations
@@ -21,6 +27,7 @@ from typing import Literal
 
 HOUR = 3_600
 DAY = 86_400
+LABEL_DELAY = 30 * DAY  # configs/base.yaml label_delay_days; a test keeps them equal
 
 Entity = Literal["card_key", "device_key", "email_key"]
 Kind = Literal[
@@ -31,7 +38,11 @@ Kind = Literal[
     "amount_zscore",  # (amount - mean of prior amounts) / their sample std
     "amount_ratio",  # amount / mean of prior amounts
     "is_new",  # 1 if `column`'s value has never been seen for this entity, else 0
+    "known_frauds",  # earlier transactions whose label had arrived and was fraud
+    "known_labelled",  # earlier transactions whose label had arrived (fraud or not)
+    "known_fraud_rate",  # known_frauds / known_labelled (null when none)
 ]
+LABEL_KINDS = frozenset({"known_frauds", "known_labelled", "known_fraud_rate"})
 
 # Below this the prior standard deviation is treated as zero, so both implementations
 # agree on when the z-score is undefined despite rounding noise.
@@ -69,6 +80,21 @@ class Aggregate:
             )
         if self.kind == "amount_ratio":
             return f"This amount divided by the mean of {who}'s previous amounts (null if none)."
+        if self.kind == "known_frauds":
+            return (
+                f"Earlier transactions by {who} labelled fraud, counting only labels that had "
+                f"arrived ({LABEL_DELAY // DAY} days after their transaction)."
+            )
+        if self.kind == "known_labelled":
+            return (
+                f"Earlier transactions by {who} old enough for their label to have arrived "
+                f"(more than {LABEL_DELAY // DAY} days before)."
+            )
+        if self.kind == "known_fraud_rate":
+            return (
+                f"Share of {who}'s transactions with an arrived label that were fraud (null "
+                "if none)."
+            )
         return (
             f"1 if this {_col_name(self.column, plural=False)} has never been seen for "
             f"{who} before, else 0 (null when unknown)."
@@ -153,6 +179,28 @@ AGGREGATES: list[Aggregate] = [
     ),
     Aggregate(
         "email_txn_7d", "email_key", "count", 7 * DAY, "How common this email domain is lately"
+    ),
+    # the card's history of reported chargebacks (labels that had arrived)
+    Aggregate(
+        "card_known_chargebacks",
+        "card_key",
+        "known_frauds",
+        None,
+        "Chargebacks already reported on this card",
+    ),
+    Aggregate(
+        "card_known_labelled",
+        "card_key",
+        "known_labelled",
+        None,
+        "Card transactions old enough to have a label",
+    ),
+    Aggregate(
+        "card_known_fraud_rate",
+        "card_key",
+        "known_fraud_rate",
+        None,
+        "Share of the card's labelled transactions that were fraud",
     ),
 ]
 

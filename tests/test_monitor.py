@@ -125,3 +125,23 @@ def test_feed_health_flags_a_field_that_goes_silent():
     assert feed_health(ref, normal) == []
     silent = normal.assign(DeviceType="(missing)", has_identity="False", device_txn_24h=np.nan)
     assert set(feed_health(ref, silent)) == {"DeviceType", "has_identity", "device_txn_24h"}
+
+
+def test_stress_replay_must_match_the_stream_before_the_outage():
+    from fraud.monitor.run import _before_outage
+
+    stream = pd.DataFrame(
+        {
+            "TransactionID": [1, 2, 3],
+            "TransactionDT": [10, 20, 30],
+            "p_fraud": [0.1, 0.2, 0.3],
+            "action": ["approve", "approve", "decline"],
+        }
+    )
+    # after the cut (25) the stress replay may differ; before it, it must not
+    stress = stream.assign(action=["approve", "approve", "approve"])
+    out = _before_outage({"replay": (stream, None), "identity_outage": (stress, None)}, cut=25)
+    assert out == {"transactions": 2, "actions_equal": 2, "max_p_fraud_difference": 0.0}
+    early = stream.assign(p_fraud=[0.1, 0.25, 0.3])
+    with pytest.raises(RuntimeError, match="before the outage"):
+        _before_outage({"replay": (stream, None), "identity_outage": (early, None)}, cut=25)

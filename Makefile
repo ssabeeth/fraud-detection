@@ -59,6 +59,14 @@ evaluate: ## Score the frozen models on validation and, once, on test; reports/m
 policy: ## Choose the policy on validation, freeze it, report it on test; reports/policy.md
 	$(UV) run fraud policy
 
+.PHONY: patterns
+patterns: ## Data patterns in December to April (never reads May); reports/data_patterns.md
+	$(UV) run fraud patterns
+
+.PHONY: experiments
+experiments: ## The pre-registered experiments on Feb, Mar and Apr (never reads May); reports/experiments.md
+	$(UV) run fraud experiments
+
 .PHONY: compare
 compare: ## LightGBM vs XGBoost vs CatBoost on Feb, Mar and Apr (never reads May); reports/model_comparison.md
 	$(UV) run fraud compare-models

@@ -45,6 +45,17 @@ def test_api_scores_explains_and_rejects_future_history(gold, fixture_models):
             name
         ] == pytest.approx(off), name
 
+    # with the history's labels, the chargeback features equal the offline ones: a label
+    # counts only for transactions more than 30 days before, and the scored one's is ignored
+    labelled = {
+        "transaction": encode_row(tx) | {"isFraud": 1},
+        "history": [encode_row(r) | {"isFraud": int(r["isFraud"])} for _, r in history.iterrows()],
+    }
+    feats = client.post("/score", json=labelled).json()["features"]
+    for name in ("card_known_chargebacks", "card_known_labelled", "card_known_fraud_rate"):
+        off = tx[name]
+        assert (feats[name] is None and off != off) or feats[name] == pytest.approx(off), name
+
     body["history"].append(encode_row(tx) | {"TransactionDT": int(tx["TransactionDT"]) + 1})
     assert client.post("/score", json=body).status_code == 422
     metrics = client.get("/metrics").text

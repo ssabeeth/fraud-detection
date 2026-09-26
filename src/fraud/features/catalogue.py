@@ -12,10 +12,13 @@ this file is out of date. Amounts are USD.
 **Point-in-time rule.** Every aggregate for a transaction at time `t` uses only
 transactions of the same entity with event time strictly before `t`; a window of `W`
 keeps those with `t - W <= t_e < t`. Transactions in the same second are not visible to
-each other. No feature uses a label. The offline (Spark) and online (stream) code both
-implement this list, and three tests hold them to it: the point-in-time test against a
-naive recomputation from raw history, a canary that must fail when the window includes
-the current row, and the online/offline parity test.
+each other. The three `card_known_*` features use fraud labels, and only labels that had
+arrived: a label arrives 30 days after its transaction (the chargeback delay), so they
+count transactions with `t_e < t - 30 days`, and never see the current transaction's own
+label. The offline (Spark) and online (stream) code both implement this list, and three
+tests hold them to it: the point-in-time test against a naive recomputation from raw
+history, a canary that must fail when a window includes the current row, and the
+online/offline parity test, which releases each label 30 days after its transaction.
 
 **Entities.** `card_key` is the pseudo-card (`card1` + `addr1` + first-seen day, see
 `reports/data.md` for how stable it is); `device_key` is a coarse device fingerprint

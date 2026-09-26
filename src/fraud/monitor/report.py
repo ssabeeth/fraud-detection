@@ -78,6 +78,10 @@ def write_monitoring_report(results: dict, out_dir: Path) -> None:
         "warning. A retrain uses every label that has arrived, so it can only ever learn from "
         "transactions at least 30 days old.",
         "",
+        "The reference month is also the month the model's early stopping, hyperparameters, "
+        "calibration and review threshold were chosen on, so it flatters the model a little: "
+        "a cohort has to fall short of a slightly optimistic mark before it alerts.",
+        "",
         "![monitors](figures/monitoring.png)",
         "",
     ]
@@ -88,9 +92,17 @@ def write_monitoring_report(results: dict, out_dir: Path) -> None:
         worst = max(daily, key=lambda d: d["score_psi"])
         warn_days = sum(d["input_drift_warn"] for d in daily)
         alert_days = sum(d["score_status"] == "alert" for d in daily)
+        lines += [f"## {title}", ""]
+        if name == "identity_outage" and "before_outage" in results:
+            b = results["before_outage"]
+            lines += [
+                f"Replayed in-process with the same delayed labels. Up to "
+                f"{results['outage_from']} it decided all {b['transactions']:,} transactions "
+                f"exactly as the stream did (largest P(fraud) difference "
+                f"{b['max_p_fraud_difference']:.1e}).",
+                "",
+            ]
         lines += [
-            f"## {title}",
-            "",
             f"- Score PSI peaked at {worst['score_psi']:.3f} on {worst['date']}; "
             f"{alert_days} of {len(daily)} days at alert level, "
             f"{sum(d['score_status'] == 'warn' for d in daily)} at warn level.",

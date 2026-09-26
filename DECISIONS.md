@@ -694,3 +694,128 @@ are unchanged. Month to month, LightGBM's own PR-AUC moves between
 0.523 and 0.556, which is the size of difference that one month
 cannot resolve.
 
+## 2026-09-25 — Pre-registered: the experiment programme and the rule for adopting a change
+
+Written and committed before any of these experiments was run.
+
+**Where.** The same three expanding-window folds as the model comparison (score
+February, March and April once each; early stopping and calibration on the last 14 days
+of each training window). May is not read. LightGBM with the comparison's chosen setting
+(63 leaves, 200 minimum samples per leaf, learning rate 0.1) for every experiment, so
+only the thing under test changes.
+
+**What.** Each experiment answers a question raised by a pattern in the training months
+(`reports/data_patterns.md`, generated from December to April only):
+
+1. Without the 17 point-in-time aggregates (what the feature engineering is worth).
+2. Without the 339 V columns (what the masked columns are worth).
+3. With the D columns normalised to dates (day minus Dn), because raw D columns grow with
+   time.
+4. With per-card means of earlier C and normalised D values, because fraud labels cover
+   whole clients.
+5. With the card's delayed-label history: chargebacks on earlier transactions whose
+   labels had arrived (30 days) before this one.
+6. With 3 to 5 together.
+7. Without the features adversarial validation finds most time-dependent.
+8. Trained on the latest 60 days only rather than every earlier month (drift).
+9. With the positive class weighted five times (imbalance).
+
+**How they are judged.** Against the current feature set in the same folds, by PR-AUC
+and by the money of the untuned expected-loss policy. For money, a 95% interval for the
+difference comes from resampling days within each scored month (1,000 draws, days kept
+whole because the review queue is per day).
+
+**Adoption rule.** A change is adopted only if it is cheaper in all three months **and**
+the 95% interval of the pooled saving excludes zero. An adopted feature is then built
+properly (Spark and stream implementations, point-in-time and parity tests), the model
+is retrained and tuned on April by the usual pipeline, the policy re-frozen on April,
+and May scored once more as a new, logged result. Anything else is reported and not
+adopted.
+
+## 2026-09-25 — Building the chargeback history into the feature system
+
+The experiment that passed (the card's chargebacks known after the 30-day delay) is now
+three aggregates in `definitions.py`, `card_known_chargebacks`, `card_known_labelled` and
+`card_known_fraud_rate`, so it has the same guarantees as every other feature:
+
+- **The rule.** A label arrives 30 days after its transaction (`LABEL_DELAY`, tested equal
+  to `label_delay_days`), so a transaction at `t` counts an earlier one at `t_e` only if
+  `t_e < t - 30 days`: the point-in-time rule shifted by the delay. The docstring's old
+  line "no feature uses a label" is replaced by this rule.
+- **Offline (Spark):** `rangeBetween(unboundedPreceding, -LABEL_DELAY - 1)` per card,
+  summing `isFraud` and counting rows. The leak canary's leaky window now also includes
+  the current row's label, and the point-in-time test must catch it.
+- **Online:** the card's state counts the fraud labels observed (`observe_label`). The count
+  of labelled transactions needs no label: it is every committed transaction minus those
+  in the last 30 days, which the state already holds.
+- **Stream ordering.** Labels and transactions are on different topics, which Kafka does
+  not order against each other. **Options:** one topic for both; watermark messages;
+  scoring with whatever labels have arrived (not reproducible, so no exact parity).
+  **Decision:** the producer stamps each transaction with how many labels it has
+  published before it (`_labels_before`), and the processor scores a transaction once it
+  has applied that many. It then sees exactly the labels released before it, a
+  transaction waits only while one of those labels is still in flight, and no message is
+  added. Labels released before the replay window are applied at warm-up.
+- **API.** History items may carry `isFraud`; a label counts only when its transaction
+  is more than 30 days before the one scored, and a label on the scored transaction is
+  ignored.
+- **Tests.** The fixtures exercise non-zero chargeback counts; the online/offline test
+  replays labels in time order; a unit test pins the tie rule (a label released in the
+  same second as a transaction is not visible to it); the API test checks the three
+  features against the offline table.
+
+## 2026-09-25 — Failure: the stream counted chargebacks early, and parity caught it
+
+The first full-speed replay after adding the chargeback history failed the stream parity
+check: `card_known_chargebacks` was too high on 4,166 of May's 89,326 transactions (by 1
+to 49) and 196 actions differed from the offline policy. The in-process parity check had
+passed with 15.9 million values equal, so the feature code was right; the stream was not.
+The barrier made each transaction wait for the labels published before it, but the
+processor applied every label as soon as it read one, and at full speed it read the
+labels topic ahead of the transactions, so chargebacks from later in May reached earlier
+decisions. **Fix:** labels are buffered and applied in order up to exactly each
+transaction's `_labels_before`. `tests/test_processor.py` feeds the two topics in three
+orders (labels first, transactions first, interleaved) and fails on the old processor.
+The Kafka test on the fixtures had passed because its topics happened to be read in a
+harmless order, which is why the new test does not rely on the broker.
+
+## 2026-09-25 — Result: the chargeback history on May
+
+The model was retrained on December to March with the three `card_known_*` features by
+the usual pipeline (the same LightGBM grid, early stopping and calibration choice, all on
+April), the expected-loss policy re-tuned on April and frozen, and May scored once more.
+The two reads are logged in `reports/test_touches.jsonl` with the note "phase 4b: model
+retrained with the card's chargeback history", as is the explainability experiment's.
+
+| May 2018 | First version | With the chargeback history |
+|---|---|---|
+| Chosen policy, total cost | $278,535 | **$231,926** |
+| Fraud value caught | 59.8% | **66.7%** |
+| Against the rules ($474,219) | 41% less | **51% less** |
+| Sensitivity table, saving against the rules | 39% to 46% | **48% to 56%** (14 of 14 cheaper) |
+| LightGBM PR-AUC / ROC-AUC | 0.547 / 0.903 | **0.638 / 0.932** |
+| Explainable-only model, total cost | $371,047 | **$309,078** |
+
+May's saving ($46,609) is in line with the three folds' estimate ($49,176 a month, 95%
+interval $40,023 to $59,372), so the out-of-sample month agrees with the experiment that
+chose the change. The earlier headline stays in this log and in the git history (tag
+`v0.12-readme`).
+
+
+## 2026-09-25 — Failure: the stress replay forgot the chargebacks
+
+The identity-outage scenario in `fraud monitor` replays May in-process instead of through
+Kafka. Its scorer was warmed and fed transactions only, so after the chargeback history
+was added every one of its cards had no known chargebacks, and all five May cohorts
+alerted, including the three weeks before the outage began. **Fix:** the scenario applies
+each label 30 days after its transaction, as the stream does, and `fraud monitor` now
+refuses to report unless the scenario decides every pre-outage transaction exactly as the
+stream did (63,188 of 63,188, largest P(fraud) difference 0). With that in place the
+outage barely moves the model: the last two weeks' PR-AUC changes by 0.002 or less.
+
+The monitoring result changed with the new model. The week of 8 May caught 60.3% of fraud
+value against April's 71.0%, more than the 10-point allowance, so the retrain rule fires
+on 14 June when that week's labels are complete (the first version, measured against
+April's 64.2%, never fired). The threshold was left as registered: April is the tuning
+month and flatters the mark a little, which the report now says, but moving the threshold
+after seeing May would be tuning the monitor on the test month.
