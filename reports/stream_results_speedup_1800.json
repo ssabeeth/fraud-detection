@@ -8,26 +8,27 @@
   "produced": {
     "transactions": 89326,
     "labels": 172981,
-    "seconds": 2927.98
+    "seconds": 2927.99
   },
   "processor": {
     "events": 89326,
-    "seconds": 1487.47,
+    "seconds": 1487.22,
     "events_per_second": 60.1,
     "processing_ms": {
-      "p50": 5.797,
-      "p95": 9.732,
-      "p99": 19.032,
-      "max": 179.988,
-      "mean": 6.408
+      "p50": 4.5,
+      "p95": 8.29,
+      "p99": 14.82,
+      "max": 206.32,
+      "mean": 5.032
     },
     "end_to_end_ms": {
-      "p50": 15.522,
-      "p95": 30.393,
-      "p99": 55.719,
-      "max": 281.076,
-      "mean": 18.28
+      "p50": 12.413,
+      "p95": 22.585,
+      "p99": 29.218,
+      "max": 316.274,
+      "mean": 14.22
     },
+    "labels_applied": 87550,
     "keys_in_state": {
       "card_key": 217850,
       "device_key": 9500,
@@ -40,21 +41,21 @@
     "decisions": 89326,
     "labels": 172981
   },
-  "sink_seconds": 3.7,
+  "sink_seconds": 4.9,
   "parity": {
     "rows_compared": 89326,
     "window_rows": 89326,
-    "features_compared": 20,
+    "features_compared": 23,
     "feature_mismatches": 0,
     "feature_mismatches_by_name": {},
     "actions_agree": 89326,
     "actions_compared": 89326,
-    "max_abs_score_difference": 1.2434497875801753e-14,
+    "max_abs_score_difference": 8.382183835919932e-15,
     "decisions_without_reasons": 0,
     "actions": {
-      "approve": 85237,
-      "decline": 2608,
-      "review": 1481
+      "approve": 85224,
+      "decline": 2682,
+      "review": 1420
     }
   }
 }

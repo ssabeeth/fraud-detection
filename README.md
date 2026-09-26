@@ -120,20 +120,23 @@ probability saves $69,210 on April with the same number of reviews. Full tables 
 
 ### Streaming, serving, explainability, monitoring
 
-- **Latency.** One process makes 183 decisions a second, each 5.4 ms (median) of
+- **Latency.** One process makes 258 decisions a second, each 3.8 ms (median) of
   online features, LightGBM score, exact TreeSHAP reasons and policy. Paced at 1,800×
-  real time, a transaction's decision is published 15.5 ms after it is sent (p99
-  56 ms) ([reports/stream.md](reports/stream.md)).
+  real time, a transaction's decision is published 12.4 ms after it is sent (p99
+  29 ms) ([reports/stream.md](reports/stream.md)).
 - **The price of explainability.** The same set-up on the 39 features a reviewer can be
   told about (the chargeback history among them) costs $309,078 on May, **$77,152
   more**. 54% of the full model's alerts have one of Vesta's masked columns as their top
   reason ([reports/explainability.md](reports/explainability.md)).
 - **Monitoring under a 30-day label delay.** Input-drift warnings fired on 16 of 25 days
   in May, on the velocity features (the same shift that broke logistic regression).
-  Scores stayed stable (PSI ≤ 0.011), so no retrain was triggered. The weekly cohorts,
-  complete only in June, confirm the model held (PR-AUC 0.49 to 0.59 against 0.62 on
-  April). In a stress scenario the identity feed goes silent on 22 May; the feed-health
-  check raises an alert on 23 May ([reports/monitoring.md](reports/monitoring.md)).
+  Scores stayed stable (PSI ≤ 0.014). The weekly cohorts, complete only in June, score
+  PR-AUC 0.58 to 0.68 against 0.71 on April. The week of 8 May caught 60.3% of fraud
+  value against April's 71.0%, so the retrain rule fires on 14 June, the day its labels
+  are complete. April is also the tuning month, so that mark is a little optimistic. In
+  a stress scenario the identity feed goes silent on 22 May: the feed-health check
+  alerts on 23 May, and the model barely notices (the last two weeks' PR-AUC moves by
+  0.002 or less) ([reports/monitoring.md](reports/monitoring.md)).
 
 ## Architecture
 
@@ -296,6 +299,8 @@ The full log with the options considered is in [DECISIONS.md](DECISIONS.md). The
   - quadratic Spark windows on hot keys;
   - a stream checkpoint that would have skipped a second replay;
   - a drift monitor that saw a silent feed only after ten days.
+  - a stress replay that never applied the chargebacks, caught because every week
+    alerted, even before the outage.
 
 ## Known limitations
 

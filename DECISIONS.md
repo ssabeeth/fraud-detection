@@ -801,3 +801,21 @@ interval $40,023 to $59,372), so the out-of-sample month agrees with the experim
 chose the change. The earlier headline stays in this log and in the git history (tag
 `v0.12-readme`).
 
+
+## 2026-09-25 — Failure: the stress replay forgot the chargebacks
+
+The identity-outage scenario in `fraud monitor` replays May in-process instead of through
+Kafka. Its scorer was warmed and fed transactions only, so after the chargeback history
+was added every one of its cards had no known chargebacks, and all five May cohorts
+alerted, including the three weeks before the outage began. **Fix:** the scenario applies
+each label 30 days after its transaction, as the stream does, and `fraud monitor` now
+refuses to report unless the scenario decides every pre-outage transaction exactly as the
+stream did (63,188 of 63,188, largest P(fraud) difference 0). With that in place the
+outage barely moves the model: the last two weeks' PR-AUC changes by 0.002 or less.
+
+The monitoring result changed with the new model. The week of 8 May caught 60.3% of fraud
+value against April's 71.0%, more than the 10-point allowance, so the retrain rule fires
+on 14 June when that week's labels are complete (the first version, measured against
+April's 64.2%, never fired). The threshold was left as registered: April is the tuning
+month and flatters the mark a little, which the report now says, but moving the threshold
+after seeing May would be tuning the monitor on the test month.

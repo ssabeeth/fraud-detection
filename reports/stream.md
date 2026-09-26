@@ -37,7 +37,7 @@ Kafka and any time the event waited in the topic.
 | Replay | Events | Decisions per second | Processing p50 / p95 / p99 (ms) | End to end p50 / p95 / p99 (ms) |
 |---|---|---|---|---|
 | as fast as possible | 89,326 | 258 | 3.81 / 3.94 / 4.08 (max 184.8) | 168548.56 / 319200.38 / 332541.25 (max 335912.7) |
-| 1800× real time | 89,326 | 60 | 5.80 / 9.73 / 19.03 (max 180.0) | 15.52 / 30.39 / 55.72 (max 281.1) |
+| 1800× real time | 89,326 | 60 | 4.50 / 8.29 / 14.82 (max 206.3) | 12.41 / 22.59 / 29.22 (max 316.3) |
 
 Replayed as fast as possible, the decisions per second are the processor's capacity,
 and end-to-end latency is mostly queueing behind the backlog the producer builds.
